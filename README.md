@@ -57,7 +57,8 @@ You can find the ATK documentation on https://zolenas.github.io/agile-time-keepe
 
 ## Next step
 
-* Add a settings page to manage the progres bar.
+* Modify the progression timer to display time and not percent
+* Add a settings page to manage the progress bar.
 
 ## Authors
 
