@@ -1,0 +1,21 @@
+# Package Files
+*.rar
+*.tar.gz
+*.tgz
+*.zip
+
+# IDE folders
+.idea/
+.project/
+.settings/
+.vscode/
+
+# Project folders
+coverage/
+dist/
+logs/
+node_modules/
+
+# Project files
+*.log*
+*-lock.json

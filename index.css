@@ -1,0 +1,244 @@
+html body {
+    background-color: #212121;
+    color: #fafafa;
+    font-family: Tahoma, Verdana, Geneva, sans-serif;
+}
+
+header {
+    height: 160px;
+    display: flex !important;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+
+    margin-bottom: 50px;
+}
+
+h1#title {
+    color: #fafafa;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+#date {
+    padding: 0 40px;
+    /*align-self: flex-end;*/
+}
+
+.bar-container {
+    position: relative;
+    height: 260px;
+    margin: 20px 40px;
+    margin-bottom: 0;
+    border: 2px solid #fafafa;
+    z-index: 10;
+}
+
+#progress {
+    position: absolute;
+    height: 100%; width: 100%;
+    background-color: #E0E0E0;
+    overflow: hidden;
+    
+    z-index: 10;
+}
+
+.sub-container {
+    border: 2px solid #fafafa;
+    background-color: #212121;
+    font-weight: bold;
+    overflow: hidden;
+    z-index: 100;
+}
+
+.time-container {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-end;
+    align-items: center;
+
+    height: 140px; width: 140px;
+    bottom:0; left:50%;
+    margin-bottom: -70px; 
+    transform: translateX(-50%);
+
+    border-radius: 70px;
+    font-size: 2em;
+}
+
+.progression {
+    height: 48px;
+}
+
+.subtitle-container {
+    position: absolute;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    
+    height: 80px; min-width: 200px; 
+    top:0; left:50%;
+    padding: 10px 30px;
+    margin-top: -40px;
+    transform: translateX(-50%);
+
+    border-radius: 20px;
+}
+
+.btn-container {
+    text-align: center;
+    z-index: 10;
+}
+
+.subtitle {
+    font-size: 2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+.bar {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    width: 100%;
+    background-color: rgba(0,0,0,0.7);
+    border-left: 4px solid #fafafa;
+    box-sizing: border-box;
+    z-index: 100;
+}
+
+.progress-bar {
+    font-size: 2em;
+    border-left: 1px solid #212121;
+    border-right: 1px solid #212121;
+    box-sizing: border-box;
+    overflow: hidden;
+    z-index: 10;
+}
+
+.btn {
+    margin: 10px 80px;
+    color: #fafafa;
+    font-weight: bold;
+}
+
+.btn.btn-secondary {
+    background-color: #fafafa;
+}
+
+#startBtn {
+    height: 66px;
+    padding-left: 80px; padding-right: 80px;
+    margin: 0;
+    font-size: 0.6em; font-weight: bold;
+    text-transform: uppercase;
+}
+
+#startBtn:focus {
+    box-shadow: none;
+}
+
+.extra-container {
+    position: absolute;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    
+    top: 560px; left: 0px; bottom: 0px;
+    width: 100%;
+
+    overflow: auto;
+}
+
+.extra {
+    display: none;
+    margin: 20px 40px; padding: 10px 16px;
+    border: 2px solid #fafafa;
+    box-sizing: border-box;
+    background-color: #212121;
+
+    font-size: 2em;
+    text-align: center;
+
+    overflow: hidden;
+    z-index: 100;
+}
+
+/* Colors */
+.progress-bar.red {
+    background-color: #F44336;
+}
+
+.progress-bar.blue {
+    background-color: #03A9F4;
+}
+
+.progress-bar.green {
+    background-color: #4CAF50;
+}
+
+.progress-bar.yellow {
+    background-color: #FFC107;
+}
+
+.progress-bar.purple {
+    background-color: #673AB7;
+}
+
+footer {
+    position: absolute;
+    bottom:0; right:0;
+    color: #424242;
+    padding: 10px 20px;
+    z-index: 0;
+}
+
+footer p {
+    display: inline-block;
+    margin: 0;
+}
+
+footer a {
+    color: #424242;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: none;
+}
+
+
+@-webkit-keyframes zoomIn {
+    from {
+        opacity: 0;
+        -webkit-transform: scale3d(0.3, 0.3, 0.3);
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes zoomIn {
+    from {
+        opacity: 0;
+        -webkit-transform: scale3d(0.3, 0.3, 0.3);
+        transform: scale3d(0.3, 0.3, 0.3);
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.zoomIn {
+    -webkit-animation-duration: 700ms;
+    animation-duration: 700ms;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+
+    -webkit-animation-name: zoomIn;
+    animation-name: zoomIn;
+}
