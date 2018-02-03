@@ -1,4 +1,4 @@
-# TIME 
+# AGILE TIME KEEPER 
 
 ## How to install
 
