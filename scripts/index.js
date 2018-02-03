@@ -311,7 +311,13 @@ function goToStep(s, force) {
     updatePercent(width);
 
     if(sequences[step]) {
-        setSubTitle(sequences[step].title);
+      setSubTitle(sequences[step].title);
+
+      if(sequences[step].extra) {
+        setExtra(sequences[step].extra);
+      } else {
+        setExtra();
+      }
     }
 }
 
