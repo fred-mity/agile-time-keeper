@@ -1,38 +1,43 @@
-# AGILE TIME KEEPER 
+# AGILE TIME KEEPER (ATK)
 
-## How to install
+This project permits to display a time keeper companion that help you track
+time sequence in a meeting.
 
-### Prerequistes
+![ATK screen](images/atk_screenshot.png)
 
-You must have an HTTP server to run the application.
+## Serve the pages
 
-### How to launch the project
+You have to serve the page using a HTTP Server.
 
-With node.js installed, check on :
-* https://www.npmjs.com/package/http-server
+- With [node.js](https://www.npmjs.com/package/http-server):
 
 ```bash
 http-server
 ```
 
-With python :
-* https://docs.python.org/2/library/simplehttpserver.html
+- With [python 2](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
 python -m SimpleHTTPServer 8080
 ```
 
-and go on localhost:8080
+- With [python 3](https://docs.python.org/2/library/simplehttpserver.html):
+
+```bash
+python -m http.server 8080
+```
+
+and go on [localhost:8080](http://localhost:8080)
 
 ## Configuration
 
-You can set your timer by modifying the data.json file
+You can set your timer by modifying the ``data.json`` file
 
 ### Set the title of your meeting
 
 modify the "title" property.
 
-```bash
+```json
 "title": "My title"
 ```
 
@@ -41,10 +46,10 @@ modify the "title" property.
 Add an object in the sequences array.
 A sequence must contains three properties (title, duration and color).
 
-```bash
+```json
 "sequences": [
     {
-        "title": "Sequence 1",
+        "title": "Introduction",
         "duration": 1, // 1 = a minute, 0.1 = 6 sec
         "color": "red"
     }
@@ -57,18 +62,18 @@ You can find the ATK documentation on https://zolenas.github.io/agile-time-keepe
 
 ## Next step
 
-* Modify the progression timer to display time and not percent
-* Add a settings page to manage the progress bar.
+- Modify the progression timer to display time and not percent
+- Add a settings page to manage the progress bar.
 
 ## Authors
 
 ### Development Lead
 
-* [**Frédéric Faure**](mailto:frederik.faure@gmail.com)
+- [**Frédéric Faure**](mailto:frederik.faure@gmail.com)
 
 ### Co-Author
 
-* [**Nicolas Rouvière**](mailto:zesk06@gmail.com)
+- [**Nicolas Rouvière**](mailto:zesk06@gmail.com)
 
 ## License
 
