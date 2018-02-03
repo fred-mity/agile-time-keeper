@@ -51,6 +51,10 @@ A sequence must contains three properties (title, duration and color).
 ]
 ```
 
+## Documentation
+
+You can find the ATK documentation on https://zolenas.github.io/agile-time-keeper/
+
 ## Next step
 
 * Add a settings page to manage the progres bar.
