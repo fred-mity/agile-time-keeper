@@ -5,186 +5,240 @@
  * {function} interval
  * {properties} width, time, step, stepStart, isPaused, marge
  */
-var sequences, interval, bar, progression, marge,
-width, time, step, stepStart, isPaused;
+var sequences,
+  interval,
+  bar,
+  progression,
+  marge,
+  width,
+  time,
+  step,
+  stepStart,
+  totalDuration,
+  isPaused;
+
+// those key values has been tested on MAC OS
+var KEY_SPACE = 32;
+var KEY_LEFT = 37;
+var KEY_RIGHT = 39;
 
 /**
  * Initialise the page at the launch
  *
  */
 (function init() {
-    const xmlhttp = new XMLHttpRequest();
-    const url = "data.json";
-    let totalDuration;
+  const xmlhttp = new XMLHttpRequest();
+  const url = "data.json";
 
-    xmlhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            var res = JSON.parse(this.responseText);
+  xmlhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      var res = JSON.parse(this.responseText);
 
-            setPage(res);
-        }
-    };
-
-    xmlhttp.open("GET", url, true);
-    xmlhttp.send();
-
-    /**
-     * Set the page content
-     *
-     */
-    function setPage(res) {
-        document.querySelector("#title").innerHTML = res.title;
-        document.querySelector("#date").innerHTML = res.date;
-
-        sequences = res.sequences;
-        initProgressBar(sequences);
+      setPage(res);
+      // Register page shortcuts
+      document.addEventListener("keyup", doc_keyUp, false);
     }
+  };
 
-    /**
-     * Create the time progress bar node
-     * Append progress bars in it according to the array
-     * @param {array} arr
-     */
-    function initProgressBar(arr) {
-        setSequenceSize(arr);
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
 
-        var out = '<div id="bar" class="bar"></div>';
-        var i;
-        for(i = 0; i < arr.length; i++) {
-            out += '<div class="progress-bar progress-bar-striped \
-            progress-bar-animated '+ arr[i].color +'" \
+  /**
+   * Set the page content
+   *
+   */
+  function setPage(res) {
+    document.querySelector("#title").innerHTML = res.title;
+    document.querySelector("#date").innerHTML = res.date;
+
+    sequences = res.sequences;
+    initProgressBar(sequences);
+  }
+
+  /**
+   * This function is called on a document key_up
+   * Code the shortcuts here
+   */
+  function doc_keyUp(event) {
+    console.log("You pressed", event.keyCode);
+    if (event.keyCode == KEY_SPACE) {
+      ///
+      // SPACE toggle start/pause
+      ///
+      // We must prevent SPACE default behavior
+      // because if we don't SPACE bar will also push on any selected element
+      // For example, if START button is selected, you push SPACE then
+      // toggleStartPause is called
+      // then button is pushed by the event chain and
+      // then timer is toggled another time
+      event.preventDefault();
+      // And at last, toggle the clock
+      toggleStartPause();
+    } else if (event.keyCode == KEY_LEFT) {
+      previousStep();
+    } else if (event.keyCode == KEY_RIGHT) {
+      nextStep();
+    }
+  }
+
+  /**
+   * Create the time progress bar node
+   * Append progress bars in it according to the array
+   * @param {array} arr
+   */
+  function initProgressBar(arr) {
+    setSequenceSize(arr);
+
+    var out = '<div id="bar" class="bar"></div>';
+    var i;
+    for (i = 0; i < arr.length; i++) {
+      out +=
+        '<div class="progress-bar progress-bar-striped \
+            progress-bar-animated ' +
+        arr[i].color +
+        '" \
             role="progressbar" aria-valuemin="0" \
-            aria-valuemax="'+ totalDuration +'" \
-            style="width:' + arr[i].durationPercent +'%; \
-            background-color:' + arr[i].color +';">' +
-            arr[i].title + '</div>';
-        }
-
-        document.querySelector("#progress").innerHTML = out;
-        setProgressBar();
-        setDate();
+            aria-valuemax="' +
+        totalDuration +
+        '" \
+            style="width:' +
+        arr[i].durationPercent +
+        "%; \
+            background-color:" +
+        arr[i].color +
+        ';">' +
+        arr[i].title +
+        "</div>";
     }
 
-    /**
-     * Set the progress bar default properties
-     *
-     */
-    function setProgressBar() {
-      /* The progress bar */
-      bar = document.querySelector('#bar');
+    document.querySelector("#progress").innerHTML = out;
+    setProgressBar();
+    setDate();
+  }
 
-      time = 0;
+  /**
+   * Set the progress bar default properties
+   *
+   */
+  function setProgressBar() {
+    /* The progress bar */
+    bar = document.querySelector("#bar");
 
-      /* The progress bar size in percent */
-      width = 100;
+    time = 0;
 
-      /* The percent text node */
-      progression = document.querySelector('#progression');
+    /* The progress bar size in percent */
+    width = 100;
 
-      interval = setInterval(move, 10);
+    /* The percent text node */
+    progression = document.querySelector("#progression");
 
-      /* The percentage of the progress bar
-      * at which we must begin for the next step
-      */
-      stepStart = 0;
+    interval = setInterval(move, 10);
 
-      /* The current step index */
-      step = 0;
+    /* The percentage of the progress bar
+        * at which we must begin for the next step
+        */
+    stepStart = 0;
 
-      /* Percentage of progression that must be done each 0.01 sec */
-      marge = getMarge();
+    /* The current step index */
+    step = 0;
 
-      /* Checker for the progress state (running or not) */
-      isPaused = true;
+    /* Percentage of progression that must be done each 0.01 sec */
+    marge = getMarge();
 
-      /* Init the subtitle at launch */
-      setSubTitle(sequences[0].title);
-    };
+    /* Checker for the progress state (running or not) */
+    isPaused = true;
 
-    /**
-    * Get the progression marge for the bar according to the time needed
-    *
-    * @returns {number}
-    */
-    function getMarge() {
-      return (1000 / (totalDuration * 60000));
+    /* Init the subtitle at launch */
+    setSubTitle(sequences[0].title);
+  }
+
+  /**
+   * Get the progression marge for the bar according to the time needed
+   *
+   * @returns {number}
+   */
+  function getMarge() {
+    return 1000 / (totalDuration * 60000);
+  }
+
+  /**
+   * Get the total duraiton of the progress bar
+   *
+   * @param {array} seq
+   */
+  function getTotalDuration(seq) {
+    let total = 0;
+    for (i in seq) {
+      total += seq[i].duration;
     }
 
-    /**
-     * Get the total duraiton of the progress bar
-     *
-     * @param {array} seq
-     */
-    function getTotalDuration(seq) {
-        let total = 0;
-        for(i in seq) {
-            total += seq[i].duration;
-        }
+    return total;
+  }
 
-        return total;
+  function percent(d) {
+    return parseFloat((d * 100 / totalDuration).toFixed(1));
+  }
+
+  /**
+   * Split the progress bar into sequences according to the duration of each one
+   */
+  function setSequenceSize() {
+    totalDuration = getTotalDuration(sequences) || 0;
+    for (i in sequences) {
+      sequences[i].durationPercent = percent(sequences[i].duration);
+    }
+  }
+
+  /**
+   * Define the current date and display it in #date node
+   *
+   */
+  function setDate() {
+    const currentDate = new Date();
+    let day = currentDate.getDate();
+    let month = currentDate.getMonth() + 1;
+    const year = currentDate.getFullYear();
+
+    if (day < 10) {
+      day = "0" + day;
     }
 
-    function percent(d) {
-        return parseFloat(((d * 100) / totalDuration).toFixed(1));
+    if (month < 10) {
+      month = "0" + month;
     }
+    const today = `${day}/${month}/${year}`;
 
-    /**
-     * Split the progress bar into sequences according to the duration of each one
-     */
-    function setSequenceSize() {
-        totalDuration = getTotalDuration(sequences) || 0;
-        for(i in sequences) {
-            sequences[i].durationPercent = percent(sequences[i].duration);
-        }
-    }
-
-    /**
-     * Define the current date and display it in #date node
-     *
-     */
-    function setDate() {
-        const currentDate = new Date();
-        let day = currentDate.getDate();
-        let month = currentDate.getMonth() + 1;
-        const year = currentDate.getFullYear();
-
-        if(day<10) {
-            day = '0'+day
-        }
-
-        if(month<10) {
-            month = '0'+month
-        }
-        const today = `${day}/${month}/${year}`;
-
-        const date = document.querySelector('#date');
-        date.innerHTML = today;
-    }
+    const date = document.querySelector("#date");
+    date.innerHTML = today;
+  }
 })();
 
 /**
  * Launch the progress bar
  * : reduce the #bar width from 100 to 0
  */
-function move()  {
-    if(!isPaused) {
-        /* 0 < width < 100 */
-        if(width <= 0) {
-            clearInterval(interval);
-        } else {
-            width = width - marge;
-            time += 10;
-            bar.style.width = width + '%';
-            //updateTime(width);
-            updatePercent(width);
+function move() {
+  if (!isPaused) {
+    /* 0 < width < 100 */
+    if (width <= 0) {
+      clearInterval(interval);
+    } else {
+      width = width - marge;
+      time += 10;
+      bar.style.width = width + "%";
+      updateTime(width);
+      //updatePercent(width);
 
-            /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
-            if(sequences[step].durationPercent === parseFloat((100 - (width + stepStart)).toFixed(1))) {
-                updateBar();
-                //stop();
-            }
-        }
+      /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
+      if (
+        sequences[step].durationPercent ===
+        parseFloat((100 - (width + stepStart)).toFixed(1))
+      ) {
+        updateBar();
+        //stop();
+      }
     }
+  }
 }
 
 /**
@@ -192,19 +246,19 @@ function move()  {
  *
  */
 function updateBar() {
-    stepStart += sequences[step].durationPercent;
-    step ++;
+  stepStart += sequences[step].durationPercent;
+  step++;
 
-    if(sequences[step]) {
-        setSubTitle(sequences[step].title);
-        if(sequences[step].extra) {
-          setExtra(sequences[step].extra);
-        } else {
-          setExtra();
-        }
+  if (sequences[step]) {
+    setSubTitle(sequences[step].title);
+    if (sequences[step].extra) {
+      setExtra(sequences[step].extra);
     } else {
-        setSubTitle("Finished !");
+      setExtra();
     }
+  } else {
+    setSubTitle("Finished !");
+  }
 }
 
 /**
@@ -213,10 +267,12 @@ function updateBar() {
  * @param {string} t
  */
 function setSubTitle(t) {
-    title = document.querySelector('#subtitle');
-    title.style.display = 'none';
-    title.innerHTML = t;
-    setTimeout(function(){ title.style.display = 'block';}, 100);
+  title = document.querySelector("#subtitle");
+  title.style.display = "none";
+  title.innerHTML = t;
+  setTimeout(function() {
+    title.style.display = "block";
+  }, 100);
 }
 
 /**
@@ -226,12 +282,14 @@ function setSubTitle(t) {
  * @param {string} str
  */
 function setExtra(str) {
-  extra = document.querySelector('#extra');
-  extra.style.display = 'none';
+  extra = document.querySelector("#extra");
+  extra.style.display = "none";
 
-  if(str) {
+  if (str) {
     extra.innerHTML = str;
-    setTimeout(function(){ extra.style.display = 'block';}, 100);
+    setTimeout(function() {
+      extra.style.display = "block";
+    }, 100);
   }
 }
 
@@ -242,16 +300,18 @@ function setExtra(str) {
  * @param {number} p
  */
 function updatePercent(p) {
-    progression.innerHTML = `${(100 - p).toFixed(1)}%`;
+  progression.innerHTML = `${(totalDuration * 0.6 * (100 - p)).toFixed(0)}s`;
 }
 
 /**
  * Update #progression node value
  * : append time progression
  *
+ * @param {number} p
  */
-function updateTime() {
-    progression.innerHTML =  `${timeConversion(time)}`;
+function updateTime(p) {
+  let remainingTimeInMilli = (totalDuration * 600 * p).toFixed(0);
+  progression.innerHTML = `${timeConversion(remainingTimeInMilli)}`;
 }
 
 /**
@@ -261,17 +321,28 @@ function updateTime() {
  * @returns {string}
  */
 function timeConversion(millisec) {
-    const seconds = (millisec / 1000).toFixed(1);
-    const minutes = (millisec / (1000 * 60)).toFixed(2);
-    const hours = (millisec / (1000 * 60 * 60)).toFixed(4);
+  let remainingSeconds = millisec / 1000;
+  let hours = Math.floor(remainingSeconds / (60 * 60));
+  remainingSeconds = remainingSeconds - hours * (60 * 60);
+  let minutes = Math.floor(remainingSeconds / 60);
+  remainingSeconds = remainingSeconds - minutes * 60;
+  const seconds = Math.floor(remainingSeconds);
 
-    if (seconds < 60) {
-        return seconds + " Sec";
-    } else if (minutes < 60) {
-        return minutes + " Min";
-    } else if (hours < 24) {
-        return hours + " Hrs";
+  let timeString = "";
+  if (hours > 0) {
+    timeString += hours + ":";
+  }
+  if (hours > 0 || minutes > 0) {
+    if (minutes < 10) {
+      timeString += "0";
     }
+    timeString += minutes + ":";
+  }
+  if (seconds < 10) {
+    timeString += "0";
+  }
+  timeString += seconds;
+  return timeString;
 }
 
 /**
@@ -281,57 +352,61 @@ function timeConversion(millisec) {
  * @param {boolean} force
  */
 function goToStep(s, force) {
-    if(!isPaused) toogle(true);
+  if (!isPaused) toggleStartPause(true);
 
-    if(s === 0) {
-        /* If step 1 running go back to step one begin*/
-        if(width < (100 - sequences[1].durationPercent) && !force) {
-            stepStart = sequences[s].durationPercent;
-            s = step;
-        /* Else refresh to the begining */
-        } else {
-            stepStart = 0;
-        }
+  if (s === 0) {
+    /* If step 1 running go back to step one begin*/
+    if (width < 100 - sequences[1].durationPercent && !force) {
+      stepStart = sequences[s].durationPercent;
+      s = step;
+      /* Else refresh to the begining */
     } else {
-        if(step < s) {
-            stepStart += sequences[step].durationPercent;
-        } else {
-            /* If step not finished, refresh it instead of going back */
-            if(width !== (100 - stepStart)) {
-                s = step;
-            } else {
-                stepStart -= sequences[step-1].durationPercent;
-            }
-        }
+      stepStart = 0;
     }
-
-    step = s;
-    width = 100 - stepStart;
-    bar.style.width = width + '%';
-    updatePercent(width);
-
-    if(sequences[step]) {
-      setSubTitle(sequences[step].title);
-
-      if(sequences[step].extra) {
-        setExtra(sequences[step].extra);
+  } else {
+    if (step < s) {
+      stepStart += sequences[step].durationPercent;
+    } else {
+      /* If step not finished, refresh it instead of going back */
+      if (width !== 100 - stepStart) {
+        s = step;
       } else {
-        setExtra();
+        stepStart -= sequences[step - 1].durationPercent;
       }
     }
+  }
+
+  step = s;
+  width = 100 - stepStart;
+  bar.style.width = width + "%";
+  updatePercent(width);
+
+  if (sequences[step]) {
+    setSubTitle(sequences[step].title);
+
+    if (sequences[step].extra) {
+      setExtra(sequences[step].extra);
+    } else {
+      setExtra();
+    }
+  }
 }
 
-function backStep() {
-    if(step !== 0) {
-        goToStep(step-1);
-    }
+function previousStep() {
+  if (step !== 0) {
+    goToStep(step - 1);
+  } else {
+    // when on first step
+    // just go back to begining
+    goToStep(0, true);
+  }
 }
 
 function nextStep() {
-    const nbStep = sequences.length;
-    if(step !== nbStep) {
-        goToStep(step+1);
-    }
+  const nbStep = sequences.length;
+  if (step !== nbStep) {
+    goToStep(step + 1);
+  }
 }
 
 /**
@@ -339,26 +414,26 @@ function nextStep() {
  * Also redefine the start button content text
  *
  */
-function toogle(v) {
-    if(v) {
-        isPaused = v;
-    } else {
-        isPaused = !isPaused;
-    }
+function toggleStartPause(v) {
+  if (v) {
+    isPaused = v;
+  } else {
+    isPaused = !isPaused;
+  }
 
-    const startBtn = document.querySelector('#startBtn');
+  const startBtn = document.querySelector("#startBtn");
 
-    if(isPaused) {
-        startBtn.innerHTML = "Start";
-    } else {
-        startBtn.innerHTML = "Pause";
-    }
+  if (isPaused) {
+    startBtn.innerHTML = "Start";
+  } else {
+    startBtn.innerHTML = "Pause";
+  }
 }
 
 function stop() {
-    clearInterval(interval);
+  clearInterval(interval);
 }
 
 function restart() {
-    goToStep(0, true);
+  goToStep(0, true);
 }

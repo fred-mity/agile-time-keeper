@@ -2,24 +2,24 @@
     "title": "Agile Meeting",
     "sequences": [
         {
-            "title": "Step 1",
+            "title": "Introduction",
             "duration": 0.1,
             "color": "red"
         },
         {
-            "title": "Step 2",
+            "title": "First Topic",
             "duration": 0.2,
             "color": "purple",
             "extra": "extra content is extra cool !"
         },
         {
-            "title": "Step 3",
+            "title": "Second Topic",
             "duration": 0.4,
-            "color": "blue"
-        }
-        ,
+            "color": "blue",
+            "extra": "A major topic that takes time"
+        },
         {
-            "title": "Step 4",
+            "title": "Conclusion",
             "duration": 0.5,
             "color": "green"
         }

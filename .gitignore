@@ -19,3 +19,6 @@ node_modules/
 # Project files
 *.log*
 *-lock.json
+
+# MAC OS files
+.DS_Store
