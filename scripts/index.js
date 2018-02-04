@@ -90,7 +90,8 @@ var KEY_RIGHT = 39;
   function initProgressBar(arr) {
     setSequenceSize(arr);
 
-    var out = '<div id="bar" class="bar"></div> \
+    var out =
+      '<div id="bar" class="bar"></div> \
     <span id="startText" class="progress-text">Start</span> ';
     var i;
     for (i = 0; i < arr.length; i++) {
@@ -134,7 +135,6 @@ var KEY_RIGHT = 39;
     /* The progression text nodes */
     sequenceProgression = document.querySelector("#sequenceProgression");
     totalProgression = document.querySelector("#totalProgression");
-
 
     interval = setInterval(move, 10);
 
@@ -188,8 +188,13 @@ var KEY_RIGHT = 39;
    */
   function setSequenceSize() {
     totalDuration = getTotalDuration(sequences) || 0;
+    let beginAt = 0;
     for (i in sequences) {
-      sequences[i].durationPercent = percent(sequences[i].duration);
+      let sequence = sequences[i];
+      sequence.durationPercent = percent(sequence.duration);
+      sequence.beginAt = beginAt;
+      sequence.endAt = beginAt + sequence.duration;
+      beginAt += sequence.duration;
     }
   }
 
@@ -323,16 +328,20 @@ function updateTime(p) {
  * Update #progression node value
  * : append time progression
  *
- * @param {number} p
+ * @param {number} remainingPercent
  */
-function updateRemainingTime(p) {
-  let remainingTimeInMilli = (totalDuration * 600 * p).toFixed(0);
+function updateRemainingTime(remainingPercent) {
+  let remainingTimeInMilli = totalDuration * 600 * remainingPercent;
+  remainingTimeInMilli = remainingTimeInMilli.toFixed(0);
   totalProgression.innerHTML = `${timeConversion(remainingTimeInMilli)}`;
 
-  // FIXME !
-  // add seq param = sequences[step].duration;
-  //let seqRemainingTimeInMilli = (seq * 600 * p).toFixed(0);
-  //sequenceProgression.innerHTML = `${timeConversion(seqRemainingTimeInMilli)}`;
+  // Compute sequence remaining time
+  let elapsedTimeInMilli = totalDuration * 600 * (100 - remainingPercent);
+  elapsedTimeInMilli = elapsedTimeInMilli.toFixed(0);
+  let endAtInMilli = sequences[step].endAt * 60 * 1000;
+  endAtInMilli = endAtInMilli.toFixed(0);
+  let setRemainInMilli = endAtInMilli - elapsedTimeInMilli;
+  sequenceProgression.innerHTML = `${timeConversion(setRemainInMilli)}`;
 }
 
 /**
