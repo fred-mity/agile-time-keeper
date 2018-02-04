@@ -29,7 +29,7 @@
 
         <div class="time-container sub-container">
             <div id="progression" class="progression">-</div>
-            <button id="startBtn" onclick="toogle()" type="button" class="btn btn-primary">Start</button>
+            <button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>
         </div>
         <div id="progress" class="progress">
             <!-- Should contains bars for sequences -->
@@ -37,7 +37,7 @@
     </div>
 
     <div class="btn-container">
-        <button onclick="backStep()" type="button" class="btn btn-secondary" title="Last step">
+        <button onclick="previousStep()" type="button" class="btn btn-secondary" title="Previous step">
             <img src="icons/ic_skip_previous.svg" alt="Previous icon">
         </button>
         <button onclick="nextStep()" type="button" class="btn btn-secondary" title="Next step">

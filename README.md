@@ -9,19 +9,19 @@ time sequence in a meeting.
 
 You have to serve the page using a HTTP Server.
 
-- With [node.js](https://www.npmjs.com/package/http-server):
+* With [node.js](https://www.npmjs.com/package/http-server):
 
 ```bash
 http-server
 ```
 
-- With [python 2](https://docs.python.org/2/library/simplehttpserver.html):
+* With [python 2](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
 python -m SimpleHTTPServer 8080
 ```
 
-- With [python 3](https://docs.python.org/2/library/simplehttpserver.html):
+* With [python 3](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
 python -m http.server 8080
@@ -31,7 +31,7 @@ and go on [localhost:8080](http://localhost:8080)
 
 ## Configuration
 
-You can set your timer by modifying the ``data.json`` file
+You can set your timer by modifying the `data.json` file
 
 ### Set the title of your meeting
 
@@ -58,22 +58,22 @@ A sequence must contains three properties (title, duration and color).
 
 ## Documentation
 
-You can find the ATK documentation on https://zolenas.github.io/agile-time-keeper/
+You can find the ATK documentation [here](https://zolenas.github.io/agile-time-keeper/)
 
-## Next step
+## Next steps
 
-- Modify the progression timer to display time and not percent
-- Add a settings page to manage the progress bar.
+* Modify the progression timer to display time and not percent
+* Add a settings page to manage the progress bar.
 
 ## Authors
 
 ### Development Lead
 
-- [**Frédéric Faure**](mailto:frederik.faure@gmail.com)
+* [**Frédéric Faure**](mailto:frederik.faure@gmail.com)
 
 ### Co-Author
 
-- [**Nicolas Rouvière**](mailto:zesk06@gmail.com)
+* [**Nicolas Rouvière**](mailto:zesk06@gmail.com)
 
 ## License
 
