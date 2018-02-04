@@ -50,15 +50,20 @@ A sequence must contains three properties (title, duration and color).
 "sequences": [
     {
         "title": "Introduction",
-        "duration": 1, // 1 = a minute, 0.1 = 6 sec
-        "color": "red"
+        "duration": 1,
+        "color": "red",
+        "extra": "my introduction extra content"
     }
 ]
 ```
+* 1 = a minute
+* 0.1 = 6 sec
+* colors available = blue, red, yellow, purple, green
+* extra = optional
 
-## Documentation
+## Demo
 
-You can find the ATK documentation [here](https://zolenas.github.io/agile-time-keeper/)
+You can find the ATK demo [here](https://zolenas.github.io/agile-time-keeper/)
 
 ## Next steps
 
