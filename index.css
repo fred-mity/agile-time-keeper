@@ -221,6 +221,14 @@ footer a:hover {
   text-decoration: none;
 }
 
+footer:hover {
+  color: #8a8a8a;
+}
+
+.shortcuts {
+  left: 0;
+}
+
 @-webkit-keyframes zoomIn {
   from {
     opacity: 0;

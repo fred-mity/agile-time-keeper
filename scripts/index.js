@@ -16,6 +16,11 @@ var sequences,
   stepStart,
   isPaused;
 
+// those key values has been tested on MAC OS
+var KEY_SPACE = 32;
+var KEY_LEFT = 37;
+var KEY_RIGHT = 39;
+
 /**
  * Initialise the page at the launch
  *
@@ -30,6 +35,8 @@ var sequences,
       var res = JSON.parse(this.responseText);
 
       setPage(res);
+      // Register page shortcuts
+      document.addEventListener("keyup", doc_keyUp, false);
     }
   };
 
@@ -46,6 +53,32 @@ var sequences,
 
     sequences = res.sequences;
     initProgressBar(sequences);
+  }
+
+  /**
+   * This function is called on a document key_up
+   * Code the shortcuts here
+   */
+  function doc_keyUp(event) {
+    console.log("You pressed", event.keyCode);
+    if (event.keyCode == KEY_SPACE) {
+      ///
+      // SPACE toggle start/pause
+      ///
+      // We must prevent SPACE default behavior
+      // because if we don't SPACE bar will also push on any selected element
+      // For example, if START button is selected, you push SPACE then
+      // toggleStartPause is called
+      // then button is pushed by the event chain and
+      // then timer is toggled another time
+      event.preventDefault();
+      // And at last, toggle the clock
+      toggleStartPause();
+    } else if (event.keyCode == KEY_LEFT) {
+      previousStep();
+    } else if (event.keyCode == KEY_RIGHT) {
+      nextStep();
+    }
   }
 
   /**
@@ -306,7 +339,7 @@ function timeConversion(millisec) {
  * @param {boolean} force
  */
 function goToStep(s, force) {
-  if (!isPaused) toogle(true);
+  if (!isPaused) toggleStartPause(true);
 
   if (s === 0) {
     /* If step 1 running go back to step one begin*/
@@ -346,7 +379,7 @@ function goToStep(s, force) {
   }
 }
 
-function backStep() {
+function previousStep() {
   if (step !== 0) {
     goToStep(step - 1);
   }
@@ -364,7 +397,7 @@ function nextStep() {
  * Also redefine the start button content text
  *
  */
-function toogle(v) {
+function toggleStartPause(v) {
   if (v) {
     isPaused = v;
   } else {
