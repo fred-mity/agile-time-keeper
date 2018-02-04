@@ -26,11 +26,22 @@
             <h2 id="subtitle" class="subtitle zoomIn"></h2>
         </div>
 
-        <div class="time-container sub-container">
-            <div id="progression" class="progression">-</div>
-            <button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>
+        <div class="time-container">
+            <span class="progression-title title-top">total</span>
+            <span class="progression-title title-bottom">step</span>
         </div>
-        <div id="progress" class="progress">
+        <div class="time-container sub-container">
+          <div class="progression progression-top">
+              <span class="time-container-label">remaining</span>
+              <span id="totalProgression">-</span>
+            </div>
+            <div class="progression progression-bottom">
+                <span class="time-container-label">remaining</span>
+              <span id="sequenceProgression">-</span>
+            </div>
+            <!--<button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>-->
+        </div>
+        <div id="progress" class="progress" onclick="toggleStartPause()">
             <!-- Should contains bars for sequences -->
         </div>
     </div>
@@ -48,13 +59,15 @@
         <div id="extra" class="extra zoomIn"></div>
     </article>
 
-    <footer class="shortcuts">
-        <small>
-            <p>SPACE : START/PAUSE</p>
-            <p>&#8592; / &#8593;: PREVIOUS/NEXT</p>
-
-        </small>
-    </footer>
+    <div class="shortcuts-container">
+      <div class="shortcuts-btn">
+        <img src="icons/ic_info.svg" alt="Next icon">
+      </div>
+      <div class="shortcuts">
+        <p>SPACE : START/PAUSE</p>
+        <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
+      </div>
+    </div>
 
     <!--<footer>
         <small>
@@ -68,21 +81,7 @@
         </small>
     </footer>-->
 
-    <script type="text/javascript" src="scripts/index.js">
-
-    var out = '<div id="bar" class="bar"></div>';
-        var i;
-        for(i = 0; i < arr.length; i++) {
-            out += '<div class="progress-bar progress-bar-striped \
-            progress-bar-animated '+ arr[i].color +'" \
-            role="progressbar" aria-valuemin="0" \
-            aria-valuemax="'+ totalDuration +'" \
-            style="width:' + arr[i].durationPercent +'%; \
-            background-color:' + arr[i].color +';">' +
-            arr[i].title + '</div>';
-        }
-
-    </script>
+    <script type="text/javascript" src="scripts/index.js"></script>
 </body>
 
 </html>

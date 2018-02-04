@@ -41,7 +41,26 @@ h1#title {
   background-color: #e0e0e0;
   overflow: hidden;
 
+  cursor: pointer;
   z-index: 10;
+}
+
+.progress-text {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5em; font-weight: bold;
+  text-transform: uppercase;
+  -webkit-transition: opacity 0.3s; /* Safari */
+  transition: opacity 0.3s;
+
+  opacity: 0;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.progress:hover .progress-text {
+  opacity: 1;
 }
 
 .sub-container {
@@ -57,7 +76,7 @@ h1#title {
   display: flex;
   flex-flow: column nowrap;
   justify-content: flex-end;
-  align-items: center;
+  align-items: stretch;
 
   height: 140px;
   width: 140px;
@@ -68,10 +87,51 @@ h1#title {
 
   border-radius: 70px;
   font-size: 2em;
+  z-index: 100;
 }
 
 .progression {
-  height: 48px;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  text-align: center;
+  height: 50%;
+}
+
+.progression span[id] {
+  font-size: 0.8em;
+}
+
+.progression-bottom {
+  background-color: #2196F3;
+}
+
+.progression span {
+  font-size: 0.4em;
+}
+
+.time-container-label {
+  padding-top: 12px;
+}
+
+.progression-title {
+  position: absolute;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  padding: 4px 0px;
+  font-size: 0.4em;
+  text-transform: uppercase;
+}
+
+.title-top {
+  top: 0;
+  transform: translateY(-100%);
+}
+
+.title-bottom {
+  bottom: 0;
+  transform: translateY(100%);
 }
 
 .subtitle-container {
@@ -175,6 +235,37 @@ h1#title {
 
   overflow: hidden;
   z-index: 100;
+}
+
+.shortcuts-container {
+  position: absolute;
+  left: 0; bottom: 0;
+  padding: 20px;
+  cursor: help;
+  z-index: 100;
+}
+
+.shortcuts-container .shortcuts-btn {
+  width: 40px; height: 40px;
+  border: 2px solid #fafafa;
+  border-radius: 20px;
+  background-color: #2196F3;
+}
+
+.shortcuts-container .shortcuts {
+  display: none;
+  padding: 20px;
+  border: 2px solid #fafafa;
+  background: #212121;
+  pointer-events: none;
+}
+
+.shortcuts-container:hover .shortcuts-btn {
+  display: none;
+}
+
+.shortcuts-container:hover .shortcuts {
+  display: block;
 }
 
 /* Colors */
