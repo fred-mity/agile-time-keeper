@@ -8,7 +8,8 @@
 var sequences,
   interval,
   bar,
-  progression,
+  totalProgression,
+  sequenceProgression,
   marge,
   width,
   time,
@@ -89,7 +90,9 @@ var KEY_RIGHT = 39;
   function initProgressBar(arr) {
     setSequenceSize(arr);
 
-    var out = '<div id="bar" class="bar"></div>';
+    var out =
+      '<div id="bar" class="bar"></div> \
+    <span id="startText" class="progress-text">Start</span> ';
     var i;
     for (i = 0; i < arr.length; i++) {
       out +=
@@ -129,8 +132,9 @@ var KEY_RIGHT = 39;
     /* The progress bar size in percent */
     width = 100;
 
-    /* The percent text node */
-    progression = document.querySelector("#progression");
+    /* The progression text nodes */
+    sequenceProgression = document.querySelector("#sequenceProgression");
+    totalProgression = document.querySelector("#totalProgression");
 
     interval = setInterval(move, 10);
 
@@ -184,8 +188,13 @@ var KEY_RIGHT = 39;
    */
   function setSequenceSize() {
     totalDuration = getTotalDuration(sequences) || 0;
+    let beginAt = 0;
     for (i in sequences) {
-      sequences[i].durationPercent = percent(sequences[i].duration);
+      let sequence = sequences[i];
+      sequence.durationPercent = percent(sequence.duration);
+      sequence.beginAt = beginAt;
+      sequence.endAt = beginAt + sequence.duration;
+      beginAt += sequence.duration;
     }
   }
 
@@ -226,7 +235,8 @@ function move() {
       width = width - marge;
       time += 10;
       bar.style.width = width + "%";
-      updateTime(width);
+      //updateTime(width);
+      updateRemainingTime(width);
       //updatePercent(width);
 
       /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
@@ -300,18 +310,38 @@ function setExtra(str) {
  * @param {number} p
  */
 function updatePercent(p) {
-  progression.innerHTML = `${(totalDuration * 0.6 * (100 - p)).toFixed(0)}s`;
+  totalProgression.innerHTML = `${(100 - p).toFixed(1)}%`;
+}
+
+/**
+ * Update #progression node value
+ * : append remaining time
+ *
+ * @param {number} p
+ */
+function updateTime(p) {
+  let total = (totalDuration * 0.6 * (100 - p)).toFixed(0);
+  totalProgression.innerHTML = `${total}s`;
 }
 
 /**
  * Update #progression node value
  * : append time progression
  *
- * @param {number} p
+ * @param {number} remainingPercent
  */
-function updateTime(p) {
-  let remainingTimeInMilli = (totalDuration * 600 * p).toFixed(0);
-  progression.innerHTML = `${timeConversion(remainingTimeInMilli)}`;
+function updateRemainingTime(remainingPercent) {
+  let remainingTimeInMilli = totalDuration * 600 * remainingPercent;
+  remainingTimeInMilli = remainingTimeInMilli.toFixed(0);
+  totalProgression.innerHTML = `${timeConversion(remainingTimeInMilli)}`;
+
+  // Compute sequence remaining time
+  let elapsedTimeInMilli = totalDuration * 600 * (100 - remainingPercent);
+  elapsedTimeInMilli = elapsedTimeInMilli.toFixed(0);
+  let endAtInMilli = sequences[step].endAt * 60 * 1000;
+  endAtInMilli = endAtInMilli.toFixed(0);
+  let setRemainInMilli = endAtInMilli - elapsedTimeInMilli;
+  sequenceProgression.innerHTML = `${timeConversion(setRemainInMilli)}`;
 }
 
 /**
@@ -379,7 +409,7 @@ function goToStep(s, force) {
   step = s;
   width = 100 - stepStart;
   bar.style.width = width + "%";
-  updatePercent(width);
+  updateRemainingTime(width);
 
   if (sequences[step]) {
     setSubTitle(sequences[step].title);
@@ -421,12 +451,12 @@ function toggleStartPause(v) {
     isPaused = !isPaused;
   }
 
-  const startBtn = document.querySelector("#startBtn");
+  const startText = document.querySelector("#startText");
 
   if (isPaused) {
-    startBtn.innerHTML = "Start";
+    startText.innerHTML = "Start";
   } else {
-    startBtn.innerHTML = "Pause";
+    startText.innerHTML = "Pause";
   }
 }
 
