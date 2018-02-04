@@ -11,9 +11,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <base href="/">
-    <link rel="stylesheet" href="index.css">
-    <!-- <link rel="stylesheet" href="bootstrap/dist/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles/index.css">
+    <link rel="stylesheet" href="styles/bootstrap.min.css">
 </head>
 
 <body>
@@ -64,12 +63,26 @@
                 <a href="mailto:zol.hen.as@gmail.com">Frederic Faure</a>
             </p> // Initiative and contribution :
             <p title="Contributor / Initial idea">
-                <a href="mailto:zesk06@gmail.com">Nicolas Rouvière</a> 
-            </p> 
+                <a href="mailto:zesk06@gmail.com">Nicolas Rouvière</a>
+            </p>
         </small>
     </footer>-->
 
-    <script type="text/javascript" src="scripts/index.js"></script>
+    <script type="text/javascript" src="scripts/index.js">
+
+    var out = '<div id="bar" class="bar"></div>';
+        var i;
+        for(i = 0; i < arr.length; i++) {
+            out += '<div class="progress-bar progress-bar-striped \
+            progress-bar-animated '+ arr[i].color +'" \
+            role="progressbar" aria-valuemin="0" \
+            aria-valuemax="'+ totalDuration +'" \
+            style="width:' + arr[i].durationPercent +'%; \
+            background-color:' + arr[i].color +';">' +
+            arr[i].title + '</div>';
+        }
+
+    </script>
 </body>
 
 </html>
