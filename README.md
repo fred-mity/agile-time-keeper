@@ -1,7 +1,6 @@
 # AGILE TIME KEEPER (ATK)
 
-This project permits to display a time keeper companion that help you track
-time sequence in a meeting.
+This project permits to display a time keeper companion that help you track time sequence in a meeting.
 
 ![ATK screen](images/atk_screenshot.png)
 
@@ -56,6 +55,7 @@ A sequence must contains three properties (title, duration and color).
     }
 ]
 ```
+
 * 1 = a minute
 * 0.1 = 6 sec
 * colors available = blue, red, yellow, purple, green
