@@ -14,6 +14,7 @@ var sequences,
   time,
   step,
   stepStart,
+  totalDuration,
   isPaused;
 
 // those key values has been tested on MAC OS
@@ -28,7 +29,6 @@ var KEY_RIGHT = 39;
 (function init() {
   const xmlhttp = new XMLHttpRequest();
   const url = "data.json";
-  let totalDuration;
 
   xmlhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
@@ -226,8 +226,8 @@ function move() {
       width = width - marge;
       time += 10;
       bar.style.width = width + "%";
-      //updateTime(width);
-      updatePercent(width);
+      updateTime(width);
+      //updatePercent(width);
 
       /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
       if (
@@ -300,16 +300,18 @@ function setExtra(str) {
  * @param {number} p
  */
 function updatePercent(p) {
-  progression.innerHTML = `${(100 - p).toFixed(1)}%`;
+  progression.innerHTML = `${(totalDuration * 0.6 * (100 - p)).toFixed(0)}s`;
 }
 
 /**
  * Update #progression node value
  * : append time progression
  *
+ * @param {number} p
  */
-function updateTime() {
-  progression.innerHTML = `${timeConversion(time)}`;
+function updateTime(p) {
+  let remainingTimeInMilli = (totalDuration * 600 * p).toFixed(0);
+  progression.innerHTML = `${timeConversion(remainingTimeInMilli)}`;
 }
 
 /**
@@ -319,17 +321,28 @@ function updateTime() {
  * @returns {string}
  */
 function timeConversion(millisec) {
-  const seconds = (millisec / 1000).toFixed(1);
-  const minutes = (millisec / (1000 * 60)).toFixed(2);
-  const hours = (millisec / (1000 * 60 * 60)).toFixed(4);
+  let remainingSeconds = millisec / 1000;
+  let hours = Math.floor(remainingSeconds / (60 * 60));
+  remainingSeconds = remainingSeconds - hours * (60 * 60);
+  let minutes = Math.floor(remainingSeconds / 60);
+  remainingSeconds = remainingSeconds - minutes * 60;
+  const seconds = Math.floor(remainingSeconds);
 
-  if (seconds < 60) {
-    return seconds + " Sec";
-  } else if (minutes < 60) {
-    return minutes + " Min";
-  } else if (hours < 24) {
-    return hours + " Hrs";
+  let timeString = "";
+  if (hours > 0) {
+    timeString += hours + ":";
   }
+  if (hours > 0 || minutes > 0) {
+    if (minutes < 10) {
+      timeString += "0";
+    }
+    timeString += minutes + ":";
+  }
+  if (seconds < 10) {
+    timeString += "0";
+  }
+  timeString += seconds;
+  return timeString;
 }
 
 /**
