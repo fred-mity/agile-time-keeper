@@ -382,6 +382,10 @@ function goToStep(s, force) {
 function previousStep() {
   if (step !== 0) {
     goToStep(step - 1);
+  } else {
+    // when on first step
+    // just go back to begining
+    goToStep(0, true);
   }
 }
 
