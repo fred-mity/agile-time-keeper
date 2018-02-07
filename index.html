@@ -31,13 +31,13 @@
             <span class="progression-title title-bottom">step</span>
         </div>
         <div class="time-container sub-container">
-          <div class="progression progression-top">
-              <span class="time-container-label">remaining</span>
-              <span id="totalProgression">-</span>
+            <div class="progression progression-top">
+                <span class="time-container-label">remaining</span>
+                <span id="totalProgression">-</span>
             </div>
             <div class="progression progression-bottom">
                 <span class="time-container-label">remaining</span>
-              <span id="sequenceProgression">-</span>
+                <span id="sequenceProgression">-</span>
             </div>
             <!--<button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>-->
         </div>
@@ -60,13 +60,19 @@
     </article>
 
     <div class="shortcuts-container">
-      <div class="shortcuts-btn">
-        <img src="icons/ic_info.svg" alt="Next icon">
-      </div>
-      <div class="shortcuts">
-        <p>SPACE : START/PAUSE</p>
-        <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
-      </div>
+        <div class="shortcuts-btn">
+            <img src="icons/ic_info.svg" alt="Next icon">
+        </div>
+        <div class="shortcuts">
+            <p>SPACE : START/PAUSE</p>
+            <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
+        </div>
+    </div>
+
+    <div class="configure">
+        <button onclick="doIt()" type="button" class="btn btn-primary" title="&#2636;">
+            &#9925;
+        </button>
     </div>
 
     <!--<footer>

@@ -28,21 +28,25 @@ var KEY_RIGHT = 39;
  *
  */
 (function init() {
-  const xmlhttp = new XMLHttpRequest();
-  const url = "data.json";
+  function loadMeeting(meetingPath) {
+    //load a meeting template with given name
+    const xmlhttp = new XMLHttpRequest();
+    const url = meetingPath;
 
-  xmlhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      var res = JSON.parse(this.responseText);
+    xmlhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        console.log("found meeting data ", this.responseText);
+        var res = JSON.parse(this.responseText);
+        setPage(res);
+      }
+    };
 
-      setPage(res);
-      // Register page shortcuts
-      document.addEventListener("keyup", doc_keyUp, false);
-    }
-  };
-
-  xmlhttp.open("GET", url, true);
-  xmlhttp.send();
+    xmlhttp.open("GET", url, true);
+    xmlhttp.send();
+  }
+  loadMeeting("data.json");
+  // Register page shortcuts
+  document.addEventListener("keyup", doc_keyUp, false);
 
   /**
    * Set the page content
@@ -466,4 +470,9 @@ function stop() {
 
 function restart() {
   goToStep(0, true);
+}
+
+function doIt() {
+  console.log("do it?");
+  loadMeeting("meetings/data_1h.json");
 }
