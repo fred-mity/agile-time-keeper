@@ -10,6 +10,7 @@ var sequences,
   bar,
   totalProgression,
   sequenceProgression,
+  loadMeeting,
   marge,
   width,
   time,
@@ -28,14 +29,13 @@ var KEY_RIGHT = 39;
  *
  */
 (function init() {
-  function loadMeeting(meetingPath) {
+  loadMeeting = function loadMeeting(meetingPath) {
     //load a meeting template with given name
     const xmlhttp = new XMLHttpRequest();
     const url = meetingPath;
 
     xmlhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
-        console.log("found meeting data ", this.responseText);
         var res = JSON.parse(this.responseText);
         setPage(res);
       }
@@ -43,7 +43,7 @@ var KEY_RIGHT = 39;
 
     xmlhttp.open("GET", url, true);
     xmlhttp.send();
-  }
+  };
   loadMeeting("data.json");
   // Register page shortcuts
   document.addEventListener("keyup", doc_keyUp, false);
@@ -57,6 +57,10 @@ var KEY_RIGHT = 39;
     document.querySelector("#date").innerHTML = res.date;
 
     sequences = res.sequences;
+    if (interval) {
+      clearInterval(interval);
+      interval = undefined;
+    }
     initProgressBar(sequences);
   }
 
@@ -115,7 +119,9 @@ var KEY_RIGHT = 39;
         arr[i].color +
         ';">' +
         arr[i].title +
-        "</div>";
+        "<br/>(" +
+        timeConversion(60000 * arr[i].duration) +
+        ")</div>";
     }
 
     document.querySelector("#progress").innerHTML = out;
@@ -470,9 +476,4 @@ function stop() {
 
 function restart() {
   goToStep(0, true);
-}
-
-function doIt() {
-  console.log("do it?");
-  loadMeeting("meetings/data_1h.json");
 }

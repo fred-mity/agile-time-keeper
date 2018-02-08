@@ -1,19 +1,19 @@
 {
-  "title": "1H Meeting",
+  "title": "15m Meeting",
   "sequences": [
     {
       "title": "Introduction",
-      "duration": 5,
+      "duration": 2,
       "color": "red"
     },
     {
       "title": "Meeting",
-      "duration": 45,
+      "duration": 10,
       "color": "purple"
     },
     {
       "title": "Conclusion",
-      "duration": 5,
+      "duration": 3,
       "color": "green"
     }
   ]

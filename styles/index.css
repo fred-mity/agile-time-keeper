@@ -47,9 +47,11 @@ h1#title {
 
 .progress-text {
   position: absolute;
-  left: 50%; top: 50%;
+  left: 50%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 5em; font-weight: bold;
+  font-size: 5em;
+  font-weight: bold;
   text-transform: uppercase;
   -webkit-transition: opacity 0.3s; /* Safari */
   transition: opacity 0.3s;
@@ -103,7 +105,7 @@ h1#title {
 }
 
 .progression-bottom {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 .progression span {
@@ -239,17 +241,19 @@ h1#title {
 
 .shortcuts-container {
   position: absolute;
-  left: 0; bottom: 0;
+  left: 0;
+  bottom: 0;
   padding: 20px;
   cursor: help;
   z-index: 100;
 }
 
 .shortcuts-container .shortcuts-btn {
-  width: 40px; height: 40px;
+  width: 40px;
+  height: 40px;
   border: 2px solid #fafafa;
   border-radius: 20px;
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 .shortcuts-container .shortcuts {
@@ -287,6 +291,24 @@ h1#title {
 
 .progress-bar.purple {
   background-color: #673ab7;
+}
+
+.configure {
+  position: absolute;
+  bottom: 0.5em;
+  left: 6em;
+}
+
+.meeting-template {
+  border: 2px solid #bbbbbb;
+  border-radius: 2px;
+  padding: 0.5em 0.2em;
+  margin-right: 0.5em;
+}
+
+.meeting-template:hover {
+  color: #2196f3;
+  cursor: pointer;
 }
 
 footer {
