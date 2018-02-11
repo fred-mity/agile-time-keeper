@@ -1,0 +1,20 @@
+{
+  "title": "30m Meeting",
+  "sequences": [
+    {
+      "title": "Introduction",
+      "duration": 5,
+      "color": "red"
+    },
+    {
+      "title": "Meeting",
+      "duration": 20,
+      "color": "purple"
+    },
+    {
+      "title": "Conclusion",
+      "duration": 5,
+      "color": "green"
+    }
+  ]
+}
