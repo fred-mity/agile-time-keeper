@@ -16,10 +16,52 @@
 </head>
 
 <body>
+    <div id="loader-container" class="loader-container">
+        <div class="loader">
+            <div></div>
+            <div></div>
+        </div>
+    </div>
     <header>
         <h1 id="title" onclick="restart()" title="Click to restart"></h1>
         <span id="date"></span>
     </header>
+
+    <nav>
+        <div class="shortcuts-container fab-btn-container">
+            <div class="shortcuts-btn fab-btn" title="Legend">
+                <img src="icons/ic_info.svg" alt="Next icon">
+            </div>
+            <div class="shortcuts fab-content">
+                <p>SPACE : START/PAUSE</p>
+                <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
+            </div>
+        </div>
+        
+        <div class="templates-container fab-btn-container">
+            <div class="templates-btn fab-btn" title="Templates">
+                <img src="icons/ic_list.svg" alt="Next icon">
+            </div>
+            <div class="meeting-templates fab-content">
+                <span onclick="loadMeeting('data_15m')" 
+                class="meeting-template" title="(2/10/3)">
+                    15min
+                </span>
+                <span onclick="loadMeeting('data_30m')" 
+                class="meeting-template" title="(5/20/5)">
+                    30min
+                </span>
+                <span onclick="loadMeeting('data_1h')" 
+                class="meeting-template" title="(5/45/5)">
+                    1H
+                </span>
+                <span onclick="loadMeeting('data_2h')" 
+                class="meeting-template" title="(15/90/15)">
+                    2H
+                </span>
+            </div>
+        </div>
+    </nav>
 
     <div class="bar-container">
         <div class="subtitle-container sub-container">
@@ -58,31 +100,6 @@
     <article class="extra-container">
         <div id="extra" class="extra zoomIn"></div>
     </article>
-
-    <div class="shortcuts-container">
-        <div class="shortcuts-btn">
-            <img src="icons/ic_info.svg" alt="Next icon">
-        </div>
-        <div class="shortcuts">
-            <p>SPACE : START/PAUSE</p>
-            <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
-        </div>
-    </div>
-
-    <div class="configure">
-        <span onclick="loadMeeting('meetings/data_15m.json')" class="meeting-template">
-            15m (2/10/3)
-        </span>
-        <span onclick="loadMeeting('meetings/data_30m.json')" class="meeting-template">
-            30m (5/20/5)
-        </span>
-        <span onclick="loadMeeting('meetings/data_1h.json')" class="meeting-template">
-            1H (5/45/5)
-        </span>
-        <span onclick="loadMeeting('meetings/data_2h.json')" class="meeting-template">
-            2H (15/90/15)
-        </span>
-    </div>
 
     <!--<footer>
         <small>
