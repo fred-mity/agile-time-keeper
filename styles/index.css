@@ -155,7 +155,7 @@ nav {
 }
 
 .progression span[id] {
-  font-size: 0.8em;
+  font-size: 0.6em;
 }
 
 .progression-bottom {
@@ -167,7 +167,7 @@ nav {
 }
 
 .time-container-label {
-  padding-top: 6px;
+  padding-top: 3px;
 }
 
 .progression-title {

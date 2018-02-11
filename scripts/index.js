@@ -1,3 +1,5 @@
+// import { meeting } from '../models/meeting';
+
 /**
  * Main properties :
  * {html nodes} bar and progression
@@ -191,7 +193,7 @@ function getMarge() {
  */
 function getTotalDuration(seq) {
   let total = 0;
-  for (i in seq) {
+  for (let i in seq) {
     total += seq[i].duration;
   }
 
@@ -208,7 +210,7 @@ function percent(d) {
 function setSequenceSize() {
   totalDuration = getTotalDuration(sequences) || 0;
   let beginAt = 0;
-  for (i in sequences) {
+  for (let i in sequences) {
     let sequence = sequences[i];
     sequence.durationPercent = percent(sequence.duration);
     sequence.beginAt = beginAt;
@@ -295,7 +297,7 @@ function updateBar() {
  * @param {string} t
  */
 function setSubTitle(t) {
-  title = document.querySelector("#subtitle");
+  const title = document.querySelector("#subtitle");
   title.style.display = "none";
   title.innerHTML = t;
   setTimeout(function() {
@@ -493,3 +495,8 @@ document.addEventListener("keyup", doc_keyUp, false);
 document.addEventListener('DOMContentLoaded', function() {
   loadMeeting("data");
 });
+
+function setNewMeeting(title, sequences) {
+  let meeting = new meeting(title, sequences);
+  setPage(meeting);
+}
