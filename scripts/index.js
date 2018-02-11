@@ -1,3 +1,5 @@
+// import { meeting } from '../models/meeting';
+
 /**
  * Main properties :
  * {html nodes} bar and progression
@@ -5,7 +7,7 @@
  * {function} interval
  * {properties} width, time, step, stepStart, isPaused, marge
  */
-var sequences,
+let sequences,
   interval,
   bar,
   totalProgression,
@@ -18,209 +20,227 @@ var sequences,
   totalDuration,
   isPaused;
 
-// those key values has been tested on MAC OS
-var KEY_SPACE = 32;
-var KEY_LEFT = 37;
-var KEY_RIGHT = 39;
+/* Those key values have been tested on MAC OS */
+const KEY_SPACE = 32;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
 
 /**
- * Initialise the page at the launch
- *
+ * Load a meeting template
+ * 
+ * @param {string} meetingName
  */
-(function init() {
+function loadMeeting(meetingName) {
+  // load a meeting template with given name
   const xmlhttp = new XMLHttpRequest();
-  const url = "data.json";
+  const url = `meetings/${meetingName}.json`;
 
   xmlhttp.onreadystatechange = function() {
+    if(this.readyState == 1) {
+      load(true);
+    }
     if (this.readyState == 4 && this.status == 200) {
-      var res = JSON.parse(this.responseText);
-
+      const res = JSON.parse(this.responseText);
       setPage(res);
-      // Register page shortcuts
-      document.addEventListener("keyup", doc_keyUp, false);
+      load(false);
     }
   };
 
   xmlhttp.open("GET", url, true);
   xmlhttp.send();
+};
 
-  /**
-   * Set the page content
-   *
-   */
-  function setPage(res) {
-    document.querySelector("#title").innerHTML = res.title;
-    document.querySelector("#date").innerHTML = res.date;
+/**
+ * Set the page content
+ *
+ */
+function setPage(res) {
+  document.querySelector("#title").innerHTML = res.title;
+  document.querySelector("#date").innerHTML = res.date;
 
-    sequences = res.sequences;
-    initProgressBar(sequences);
+  sequences = res.sequences;
+  if (interval) {
+    clearInterval(interval);
+    interval = undefined;
+  }
+  initProgressBar(sequences);
+}
+
+function load(bool) {
+  const loader = document.querySelector('#loader-container');
+  if(bool) {
+    loader.style.display = 'flex';
+  } else {
+    loader.style.display = 'none';
+  }
+}
+
+/**
+ * This function is called on a document key_up
+ * Code the shortcuts here
+ */
+function doc_keyUp(event) {
+  console.log("You pressed", event.keyCode);
+  if (event.keyCode == KEY_SPACE) {
+    ///
+    // SPACE toggle start/pause
+    ///
+    // We must prevent SPACE default behavior
+    // because if we don't SPACE bar will also push on any selected element
+    // For example, if START button is selected, you push SPACE then
+    // toggleStartPause is called
+    // then button is pushed by the event chain and
+    // then timer is toggled another time
+    event.preventDefault();
+    // And at last, toggle the clock
+    toggleStartPause();
+  } else if (event.keyCode == KEY_LEFT) {
+    previousStep();
+  } else if (event.keyCode == KEY_RIGHT) {
+    nextStep();
+  }
+}
+
+/**
+ * Create the time progress bar node
+ * Append progress bars in it according to the array
+ * @param {array} arr
+ */
+function initProgressBar(arr) {
+  setSequenceSize(arr);
+
+  let out =
+    '<div id="bar" class="bar"></div> \
+  <span id="startText" class="progress-text">Start</span> ';
+  let i;
+  for (i = 0; i < arr.length; i++) {
+    out +=
+      '<div class="progress-bar progress-bar-striped \
+          progress-bar-animated ' +
+      arr[i].color +
+      '" \
+          role="progressbar" aria-valuemin="0" \
+          aria-valuemax="' +
+      totalDuration +
+      '" \
+          style="width:' +
+      arr[i].durationPercent +
+      "%; \
+          background-color:" +
+      arr[i].color +
+      ';">' +
+      arr[i].title +
+      "<br/>(" +
+      timeConversion(60000 * arr[i].duration) +
+      ")</div>";
   }
 
-  /**
-   * This function is called on a document key_up
-   * Code the shortcuts here
-   */
-  function doc_keyUp(event) {
-    console.log("You pressed", event.keyCode);
-    if (event.keyCode == KEY_SPACE) {
-      ///
-      // SPACE toggle start/pause
-      ///
-      // We must prevent SPACE default behavior
-      // because if we don't SPACE bar will also push on any selected element
-      // For example, if START button is selected, you push SPACE then
-      // toggleStartPause is called
-      // then button is pushed by the event chain and
-      // then timer is toggled another time
-      event.preventDefault();
-      // And at last, toggle the clock
-      toggleStartPause();
-    } else if (event.keyCode == KEY_LEFT) {
-      previousStep();
-    } else if (event.keyCode == KEY_RIGHT) {
-      nextStep();
-    }
+  document.querySelector("#progress").innerHTML = out;
+  setProgressBar();
+  setDate();
+}
+
+/**
+ * Set the progress bar default properties
+ *
+ */
+function setProgressBar() {
+  /* The progress bar */
+  bar = document.querySelector("#bar");
+
+  time = 0;
+
+  /* The progress bar size in percent */
+  width = 100;
+
+  /* The progression text nodes */
+  sequenceProgression = document.querySelector("#sequenceProgression");
+  totalProgression = document.querySelector("#totalProgression");
+
+  interval = setInterval(move, 10);
+
+  /* The percentage of the progress bar
+      * at which we must begin for the next step
+      */
+  stepStart = 0;
+
+  /* The current step index */
+  step = 0;
+
+  /* Percentage of progression that must be done each 0.01 sec */
+  marge = getMarge();
+
+  /* Checker for the progress state (running or not) */
+  isPaused = true;
+
+  /* Init the subtitle at launch */
+  setSubTitle(sequences[0].title);
+}
+
+/**
+ * Get the progression marge for the bar according to the time needed
+ *
+ * @returns {number}
+ */
+function getMarge() {
+  return 1000 / (totalDuration * 60000);
+}
+
+/**
+ * Get the total duraiton of the progress bar
+ *
+ * @param {array} seq
+ */
+function getTotalDuration(seq) {
+  let total = 0;
+  for (let i in seq) {
+    total += seq[i].duration;
   }
 
-  /**
-   * Create the time progress bar node
-   * Append progress bars in it according to the array
-   * @param {array} arr
-   */
-  function initProgressBar(arr) {
-    setSequenceSize(arr);
+  return total;
+}
 
-    var out =
-      '<div id="bar" class="bar"></div> \
-    <span id="startText" class="progress-text">Start</span> ';
-    var i;
-    for (i = 0; i < arr.length; i++) {
-      out +=
-        '<div class="progress-bar progress-bar-striped \
-            progress-bar-animated ' +
-        arr[i].color +
-        '" \
-            role="progressbar" aria-valuemin="0" \
-            aria-valuemax="' +
-        totalDuration +
-        '" \
-            style="width:' +
-        arr[i].durationPercent +
-        "%; \
-            background-color:" +
-        arr[i].color +
-        ';">' +
-        arr[i].title +
-        "</div>";
-    }
+function percent(d) {
+  return parseFloat((d * 100 / totalDuration).toFixed(1));
+}
 
-    document.querySelector("#progress").innerHTML = out;
-    setProgressBar();
-    setDate();
+/**
+ * Split the progress bar into sequences according to the duration of each one
+ */
+function setSequenceSize() {
+  totalDuration = getTotalDuration(sequences) || 0;
+  let beginAt = 0;
+  for (let i in sequences) {
+    let sequence = sequences[i];
+    sequence.durationPercent = percent(sequence.duration);
+    sequence.beginAt = beginAt;
+    sequence.endAt = beginAt + sequence.duration;
+    beginAt += sequence.duration;
+  }
+}
+
+/**
+ * Define the current date and display it in #date node
+ *
+ */
+function setDate() {
+  const currentDate = new Date();
+  let day = currentDate.getDate();
+  let month = currentDate.getMonth() + 1;
+  const year = currentDate.getFullYear();
+
+  if (day < 10) {
+    day = "0" + day;
   }
 
-  /**
-   * Set the progress bar default properties
-   *
-   */
-  function setProgressBar() {
-    /* The progress bar */
-    bar = document.querySelector("#bar");
-
-    time = 0;
-
-    /* The progress bar size in percent */
-    width = 100;
-
-    /* The progression text nodes */
-    sequenceProgression = document.querySelector("#sequenceProgression");
-    totalProgression = document.querySelector("#totalProgression");
-
-    interval = setInterval(move, 10);
-
-    /* The percentage of the progress bar
-        * at which we must begin for the next step
-        */
-    stepStart = 0;
-
-    /* The current step index */
-    step = 0;
-
-    /* Percentage of progression that must be done each 0.01 sec */
-    marge = getMarge();
-
-    /* Checker for the progress state (running or not) */
-    isPaused = true;
-
-    /* Init the subtitle at launch */
-    setSubTitle(sequences[0].title);
+  if (month < 10) {
+    month = "0" + month;
   }
+  const today = `${day}/${month}/${year}`;
 
-  /**
-   * Get the progression marge for the bar according to the time needed
-   *
-   * @returns {number}
-   */
-  function getMarge() {
-    return 1000 / (totalDuration * 60000);
-  }
-
-  /**
-   * Get the total duraiton of the progress bar
-   *
-   * @param {array} seq
-   */
-  function getTotalDuration(seq) {
-    let total = 0;
-    for (i in seq) {
-      total += seq[i].duration;
-    }
-
-    return total;
-  }
-
-  function percent(d) {
-    return parseFloat((d * 100 / totalDuration).toFixed(1));
-  }
-
-  /**
-   * Split the progress bar into sequences according to the duration of each one
-   */
-  function setSequenceSize() {
-    totalDuration = getTotalDuration(sequences) || 0;
-    let beginAt = 0;
-    for (i in sequences) {
-      let sequence = sequences[i];
-      sequence.durationPercent = percent(sequence.duration);
-      sequence.beginAt = beginAt;
-      sequence.endAt = beginAt + sequence.duration;
-      beginAt += sequence.duration;
-    }
-  }
-
-  /**
-   * Define the current date and display it in #date node
-   *
-   */
-  function setDate() {
-    const currentDate = new Date();
-    let day = currentDate.getDate();
-    let month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-
-    if (day < 10) {
-      day = "0" + day;
-    }
-
-    if (month < 10) {
-      month = "0" + month;
-    }
-    const today = `${day}/${month}/${year}`;
-
-    const date = document.querySelector("#date");
-    date.innerHTML = today;
-  }
-})();
+  const date = document.querySelector("#date");
+  date.innerHTML = today;
+}
 
 /**
  * Launch the progress bar
@@ -277,7 +297,7 @@ function updateBar() {
  * @param {string} t
  */
 function setSubTitle(t) {
-  title = document.querySelector("#subtitle");
+  const title = document.querySelector("#subtitle");
   title.style.display = "none";
   title.innerHTML = t;
   setTimeout(function() {
@@ -466,4 +486,17 @@ function stop() {
 
 function restart() {
   goToStep(0, true);
+}
+
+/* Register page shortcuts */
+document.addEventListener("keyup", doc_keyUp, false);
+
+/* Create the progress bar when them DOM has been initialised */
+document.addEventListener('DOMContentLoaded', function() {
+  loadMeeting("data");
+});
+
+function setNewMeeting(title, sequences) {
+  let meeting = new meeting(title, sequences);
+  setPage(meeting);
 }

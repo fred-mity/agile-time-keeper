@@ -4,6 +4,46 @@ html body {
   font-family: Tahoma, Verdana, Geneva, sans-serif;
 }
 
+/* Loader + anim */
+.loader-container {
+  position: absolute;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%; width: 100%;
+  z-index: 1000;
+  background-color: #212121;
+}
+
+.loader {
+  display: inline-block;
+  width: 71px;
+  height: 71px;
+  margin: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: loader 2.4s cubic-bezier(0, 0.2, 0.8, 1) infinite;
+}
+
+@keyframes loader {
+  0%, 100% {
+    animation-timing-function: cubic-bezier(0.5, 0, 1, 0.5);
+  }
+  0% {
+    transform: rotateY(0deg);
+  }
+  50% {
+    transform: rotateY(1800deg);
+    animation-timing-function: cubic-bezier(0, 0.5, 0.5, 1);
+  }
+  100% {
+    transform: rotateY(3600deg);
+  }
+}
+
+
 header {
   height: 160px;
   display: flex !important;
@@ -23,6 +63,20 @@ h1#title {
 #date {
   padding: 0 40px;
   /*align-self: flex-end;*/
+}
+
+nav {
+  position: absolute;
+  top: 0; left: 0;
+
+  display: flex !important;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  color: #424242;
+  padding: 10px 20px;
+  z-index: 1000;
 }
 
 .bar-container {
@@ -47,9 +101,11 @@ h1#title {
 
 .progress-text {
   position: absolute;
-  left: 50%; top: 50%;
+  left: 50%;
+  top: 50%;
   transform: translate(-50%, -50%);
-  font-size: 5em; font-weight: bold;
+  font-size: 5em;
+  font-weight: bold;
   text-transform: uppercase;
   -webkit-transition: opacity 0.3s; /* Safari */
   transition: opacity 0.3s;
@@ -99,11 +155,11 @@ h1#title {
 }
 
 .progression span[id] {
-  font-size: 0.8em;
+  font-size: 0.6em;
 }
 
 .progression-bottom {
-  background-color: #2196F3;
+  background-color: #2196f3;
 }
 
 .progression span {
@@ -111,7 +167,7 @@ h1#title {
 }
 
 .time-container-label {
-  padding-top: 12px;
+  padding-top: 3px;
 }
 
 .progression-title {
@@ -237,62 +293,88 @@ h1#title {
   z-index: 100;
 }
 
-.shortcuts-container {
-  position: absolute;
-  left: 0; bottom: 0;
-  padding: 20px;
+.fab-btn-container {
+  position: relative;
+  padding: 14px;
   cursor: help;
   z-index: 100;
 }
 
-.shortcuts-container .shortcuts-btn {
-  width: 40px; height: 40px;
+.fab-btn-container .fab-btn {
+  width: 40px;
+  height: 40px;
   border: 2px solid #fafafa;
   border-radius: 20px;
-  background-color: #2196F3;
+  background-color: #2196f3;
+
+  -webkit-transition: all 0.4s; /* Safari */
+  transition: all 0.4s;
 }
 
-.shortcuts-container .shortcuts {
-  display: none;
-  padding: 20px;
+.fab-btn-container .fab-content {
+  position: absolute;
+  left: 0; top: 80px;
+  opacity: 0;
+  transform: translateY(-100%); 
+
+  padding: 4px 2px;
   border: 2px solid #fafafa;
   background: #212121;
-  pointer-events: none;
+  color: #fafafa;
+
+  -webkit-transition: all 0.4s; /* Safari */
+  transition: all 0.4s;
 }
 
-.shortcuts-container:hover .shortcuts-btn {
-  display: none;
+.fab-btn-container:hover .fab-btn {
+  background-color: #fafafa;
 }
 
-.shortcuts-container:hover .shortcuts {
-  display: block;
+.fab-btn-container:hover .fab-content {
+  opacity: 1;
+  transform: translateY(0); 
 }
 
-/* Colors */
-.progress-bar.red {
-  background-color: #f44336;
+.fab-btn img {
+  height: 36px; width: 36px;
 }
 
-.progress-bar.blue {
-  background-color: #03a9f4;
+.fab-btn-container .shortcuts {
+  padding: 10px;
 }
 
-.progress-bar.green {
-  background-color: #4caf50;
+.meeting-templates {
+  max-height: 200px;
+  overflow: auto;
 }
 
-.progress-bar.yellow {
-  background-color: #ffc107;
+.meeting-template:last-child {
+  border-bottom: none;
 }
 
-.progress-bar.purple {
-  background-color: #673ab7;
+.meeting-template {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 2px;
+  border-bottom: 1px solid #fafafa;
+  cursor: pointer;
+}
+
+.meeting-template:hover {
+  color: #2196f3;
 }
 
 footer {
   position: absolute;
   bottom: 0;
-  right: 0;
+  width: 100%;
+
+  display: flex !important;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
   color: #424242;
   padding: 10px 20px;
   z-index: 0;
@@ -316,9 +398,27 @@ footer:hover {
   color: #8a8a8a;
 }
 
-.shortcuts {
-  left: 0;
+/* Colors */
+.progress-bar.red {
+  background-color: #f44336;
 }
+
+.progress-bar.blue {
+  background-color: #03a9f4;
+}
+
+.progress-bar.green {
+  background-color: #4caf50;
+}
+
+.progress-bar.yellow {
+  background-color: #ffc107;
+}
+
+.progress-bar.purple {
+  background-color: #673ab7;
+}
+
 
 @-webkit-keyframes zoomIn {
   from {
