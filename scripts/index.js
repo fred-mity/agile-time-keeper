@@ -1,3 +1,5 @@
+import { meeting } from '../models/meeting';
+
 /**
  * Main properties :
  * {html nodes} bar and progression
@@ -476,4 +478,9 @@ function stop() {
 
 function restart() {
   goToStep(0, true);
+}
+
+function setNewMeeting(title, sequences) {
+  let meeting = new meeting(title, sequences);
+  setPage(meeting);
 }
