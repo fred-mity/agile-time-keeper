@@ -488,6 +488,7 @@ function restart() {
   goToStep(0, true);
 }
 
+<<<<<<< HEAD
 /* Register page shortcuts */
 document.addEventListener("keyup", doc_keyUp, false);
 
@@ -496,6 +497,8 @@ document.addEventListener('DOMContentLoaded', function() {
   loadMeeting("data");
 });
 
+=======
+>>>>>>> 8c419274657440ba3e0aa1dfa8051706b041755a
 function setNewMeeting(title, sequences) {
   let meeting = new meeting(title, sequences);
   setPage(meeting);
