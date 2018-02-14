@@ -315,7 +315,7 @@ nav {
   position: absolute;
   left: 0; top: 80px;
   opacity: 0;
-  transform: translateY(-100%); 
+  transform: translateY(-100%);
 
   padding: 4px 2px;
   border: 2px solid #fafafa;
@@ -332,7 +332,7 @@ nav {
 
 .fab-btn-container:hover .fab-content {
   opacity: 1;
-  transform: translateY(0); 
+  transform: translateY(0);
 }
 
 .fab-btn img {
@@ -363,6 +363,30 @@ nav {
 
 .meeting-template:hover {
   color: #2196f3;
+}
+
+.settings-meeting-form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.settings-meeting-form > div {
+  padding: 14px;
+  border: 1px solid #212121;
+
+  -webkit-animation-duration: 700ms;
+  animation-duration: 700ms;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+
+  -webkit-animation-name: zoomIn;
+  animation-name: zoomIn;
+}
+
+.settings-meeting-form > button {
+  align-items: flex-end;
 }
 
 footer {

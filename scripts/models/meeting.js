@@ -1,5 +1,3 @@
-import { sequence } from './sequence.mjs';
-
 export class meeting {
   constructor(title, sequences) {
     this.title = title || 'New meeting';

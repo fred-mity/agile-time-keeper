@@ -1,4 +1,5 @@
-import { meeting } from '../models/meeting.mjs';
+import { meeting } from './models/meeting.js';
+import { sequence } from './models/sequence.js';
 
 /**
  * Main properties :
@@ -27,7 +28,7 @@ const KEY_RIGHT = 39;
 
 /**
  * Load a meeting template
- * 
+ *
  * @param {string} meetingName
  */
 function loadMeeting(meetingName) {
@@ -312,7 +313,7 @@ function setSubTitle(t) {
  * @param {string} str
  */
 function setExtra(str) {
-  extra = document.querySelector("#extra");
+  const extra = document.querySelector("#extra");
   extra.style.display = "none";
 
   if (str) {
@@ -494,9 +495,53 @@ document.addEventListener("keyup", doc_keyUp, false);
 /* Create the progress bar when them DOM has been initialised */
 document.addEventListener('DOMContentLoaded', function() {
   loadMeeting("data");
+
+  // Bind module functions to window because of the scoped module
+  window.toggleStartPause = toggleStartPause;
+  window.loadMeeting = loadMeeting;
+  window.nextStep = nextStep;
+  window.previousStep = previousStep;
+  window.restart = restart;
+  window.addStep = addStep;
+  window.setNewMeeting = setNewMeeting;
 });
 
-function setNewMeeting(title, sequences) {
-  let meeting = new meeting(title, sequences);
+function setNewMeeting() {
+  const form = document.querySelector('#meetings-form');
+  const title = form.querySelector('#new-meeting-title').value;
+
+  const meeting = new meeting(title);
+
+  const j = form.childrenElementCount;
+  for(let i=0; i<j; i++) {
+    const child = form.children[i];
+    const kind = child.dataset.kind;
+    if(kind && kind === "step") {
+      const stepName = child.childNodes[0].nodeValue;
+      const stepDuration = child.childNodes[1].nodeValue;
+      const stepColor = child.childNodes[2].nodeValue;
+      const step = new sequence(stepName, stepDuration, stepColor)
+      meeting.addStep(step);
+      console.log("Step added : "+stepName);
+    }
+  }
+
   setPage(meeting);
+}
+
+function addStep() {
+  const form = document.querySelector('#meetings-form');
+  const seq = document.createElement("div");
+  seq.dataset.kind = "step";
+  seq.innerHTML = `<input type="text" name="title" value="New step"/>
+                    <input type="number" name="duration" value="0"/>
+                    <select name="color">
+                      <option value="blue">blue</option>
+                      <option value="red">red</option>
+                      <option value="green">green</option>
+                      <option value="yellow">yellow</option>
+                      <option value="purple">purple</option>
+                    </select>
+                  </div>`;
+  form.insertBefore(seq, form.lastElementChild);
 }
