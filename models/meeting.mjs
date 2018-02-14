@@ -1,4 +1,4 @@
-// import { sequence } from '/sequence';
+import { sequence } from './sequence.mjs';
 
 export class meeting {
   constructor(title, sequences) {

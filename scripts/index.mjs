@@ -1,4 +1,4 @@
-// import { meeting } from '../models/meeting';
+import { meeting } from '../models/meeting.mjs';
 
 /**
  * Main properties :
