@@ -221,9 +221,7 @@ nav {
 
 .bar {
   position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
+  right: 0; top: 0; bottom: 0;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.7);
   border-left: 4px solid #fafafa;
@@ -293,6 +291,16 @@ nav {
   z-index: 100;
 }
 
+.default-btn {
+  border: 1px solid #fafafa;
+  background-color: #fafafa;
+  cursor: pointer;
+}
+
+.default-btn:hover {
+  background-color: #2196f3;
+}
+
 .fab-btn-container {
   position: relative;
   padding: 14px;
@@ -309,6 +317,15 @@ nav {
 
   -webkit-transition: all 0.4s; /* Safari */
   transition: all 0.4s;
+}
+
+.settings-container.fab-btn-container .fab-btn,
+.sound-container.fab-btn-container .fab-btn {
+  cursor: pointer;
+}
+
+.settings-container.fab-btn-container {
+  cursor: default;
 }
 
 .fab-btn-container .fab-content {
@@ -337,6 +354,7 @@ nav {
 
 .fab-btn img {
   height: 36px; width: 36px;
+  padding: 2px;
 }
 
 .fab-btn-container .shortcuts {
@@ -365,28 +383,106 @@ nav {
   color: #2196f3;
 }
 
-.settings-meeting-form {
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
+.settings-modal {
+  display: none;
+  position: fixed;
+  right: 0; top: 0; bottom: 0; left: 0;
+  justify-content: center;
   align-items: center;
-}
-
-.settings-meeting-form > div {
-  padding: 14px;
-  border: 1px solid #212121;
-
-  -webkit-animation-duration: 700ms;
-  animation-duration: 700ms;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
+  background-color: rgba(0, 0, 0, 0.8);
 
   -webkit-animation-name: zoomIn;
   animation-name: zoomIn;
 }
 
-.settings-meeting-form > button {
+.settings {
+  position: relative;
+  background: #212121;
+  border: 2px solid #fafafa;
+  padding: 8px;
+}
+
+.new-meeting-sequences > * {
+  display: block;
+}
+
+.settings-meeting-form {
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: stretch;
+}
+
+.settings-meeting-form > div {
+  padding: 14px;
+  border: 1px solid #424242;
+  margin: 2px 0px;
+
+  -webkit-animation-duration: 700ms;
+  animation-duration: 700ms;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+}
+
+.settings-meeting-form > .default-btn {
   align-items: flex-end;
+}
+
+.meeting-form-title label {
+  font-size: 1.2em;
+  text-transform: uppercase;
+  margin-right: 10px;
+}
+
+.meeting-form-title input {
+  width: 250px;
+}
+
+.meeting-form-sequences {
+  display: flex;
+  flex-flow: column nowrap;
+}
+
+.meeting-form-sequences h3 {
+  font-size: 1.2em;
+  text-transform: uppercase;
+  align-self: center;
+}
+
+.sequences-table-line {
+  display: flex;
+  flex-flow: row nowrap;
+  margin: 4px 0px;
+}
+
+.sequences-table-line .table-line-max,
+.sequences-table-line .table-line-min {
+  margin: 0px 2px;
+  text-align: left;
+}
+
+.sequences-table-line .table-line-max {
+  width: 250px;
+}
+
+.sequences-table-line .table-line-min {
+  width: 100px;
+}
+
+.meetings-form-btns {
+  display: flex;
+  flex-flow: row nowrap;
+}
+
+.meetings-form-btns .default-btn {
+  flex: 1;
+  margin: 0px 2px;
+}
+
+.settings-close-btn {
+  position: absolute;
+  right: 10px; top: 10px;
+  z-index: 100;
 }
 
 footer {
