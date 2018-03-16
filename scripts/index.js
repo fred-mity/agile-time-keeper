@@ -1,3 +1,6 @@
+import { Meeting } from './models/meeting.js';
+import { Sequence } from './models/sequence.js';
+
 /**
  * Main properties :
  * {html nodes} bar and progression
@@ -5,7 +8,7 @@
  * {function} interval
  * {properties} width, time, step, stepStart, isPaused, marge
  */
-var sequences,
+let meeting,
   interval,
   bar,
   totalProgression,
@@ -16,211 +19,244 @@ var sequences,
   step,
   stepStart,
   totalDuration,
-  isPaused;
+  isPaused,
+  isSound;
 
-// those key values has been tested on MAC OS
-var KEY_SPACE = 32;
-var KEY_LEFT = 37;
-var KEY_RIGHT = 39;
+/* Those key values have been tested on MAC OS */
+const KEY_SPACE = 32;
+const KEY_LEFT = 37;
+const KEY_RIGHT = 39;
 
 /**
- * Initialise the page at the launch
+ * Load a meeting template
  *
+ * @param {string} meetingName
  */
-(function init() {
+function loadMeeting(meetingName) {
+  // load a meeting template with given name
   const xmlhttp = new XMLHttpRequest();
-  const url = "data.json";
+  const url = `meetings/${meetingName}.json`;
 
   xmlhttp.onreadystatechange = function() {
+    if(this.readyState == 1) {
+      load(true);
+    }
     if (this.readyState == 4 && this.status == 200) {
-      var res = JSON.parse(this.responseText);
+      const res = JSON.parse(this.responseText);
+      meeting = new Meeting(res.title, res.sequences);
 
-      setPage(res);
-      // Register page shortcuts
-      document.addEventListener("keyup", doc_keyUp, false);
+      setPage();
+      load(false);
     }
   };
 
   xmlhttp.open("GET", url, true);
   xmlhttp.send();
+};
 
-  /**
-   * Set the page content
-   *
-   */
-  function setPage(res) {
-    document.querySelector("#title").innerHTML = res.title;
-    document.querySelector("#date").innerHTML = res.date;
+/**
+ * Set the page content
+ *
+ */
+function setPage() {
+  // Set current date
+  const today = new Date();
 
-    sequences = res.sequences;
-    initProgressBar(sequences);
+  const d = today.getDay();
+  const m = today.getMonth();
+  const y = today.getFullYear();
+
+  const todayStr = `${(d <= 9 ? '0' + d : d)}/${(m <= 9 ? '0' + m : m)}/${y}`
+
+  // Set title and date
+  document.querySelector("#title").innerHTML = meeting.title;
+  document.querySelector("#date").innerHTML = todayStr;
+
+  // Init progress bar
+  if (interval) {
+    clearInterval(interval);
+    interval = undefined;
+  }
+  initProgressBar(meeting.getSequences());
+}
+
+function load(bool) {
+  const loader = document.querySelector('#loader-container');
+  if(bool) {
+    loader.style.display = 'flex';
+  } else {
+    loader.style.display = 'none';
+  }
+}
+
+/**
+ * This function is called on a document key_up
+ * Code the shortcuts here
+ */
+function doc_keyUp(event) {
+  console.log("You pressed", event.keyCode);
+  if (event.keyCode == KEY_SPACE) {
+    ///
+    // SPACE toggle start/pause
+    ///
+    // We must prevent SPACE default behavior
+    // because if we don't SPACE bar will also push on any selected element
+    // For example, if START button is selected, you push SPACE then
+    // toggleStartPause is called
+    // then button is pushed by the event chain and
+    // then timer is toggled another time
+    event.preventDefault();
+    // And at last, toggle the clock
+    toggleStartPause();
+  } else if (event.keyCode == KEY_LEFT) {
+    previousStep();
+  } else if (event.keyCode == KEY_RIGHT) {
+    nextStep();
+  }
+}
+
+/**
+ * Create the time progress bar node
+ * Append progress bars in it according to the array
+ * @param {array} arr
+ */
+function initProgressBar(arr) {
+  setSequenceSize(arr);
+
+  let out =
+    '<div id="bar" class="bar"></div> \
+  <span id="startText" class="progress-text">Start</span> ';
+  let i;
+  for (i = 0; i < arr.length; i++) {
+    out +=
+      '<div class="progress-bar progress-bar-striped \
+          progress-bar-animated ' +
+      arr[i].color +
+      '" \
+          role="progressbar" aria-valuemin="0" \
+          aria-valuemax="' +
+      totalDuration +
+      '" \
+          style="width:' +
+      arr[i].durationPercent +
+      "%; \
+          background-color:" +
+      arr[i].color +
+      ';">' +
+      arr[i].title +
+      "<br/>(" +
+      timeConversion(60000 * arr[i].duration) +
+      ")</div>";
   }
 
-  /**
-   * This function is called on a document key_up
-   * Code the shortcuts here
-   */
-  function doc_keyUp(event) {
-    console.log("You pressed", event.keyCode);
-    if (event.keyCode == KEY_SPACE) {
-      ///
-      // SPACE toggle start/pause
-      ///
-      // We must prevent SPACE default behavior
-      // because if we don't SPACE bar will also push on any selected element
-      // For example, if START button is selected, you push SPACE then
-      // toggleStartPause is called
-      // then button is pushed by the event chain and
-      // then timer is toggled another time
-      event.preventDefault();
-      // And at last, toggle the clock
-      toggleStartPause();
-    } else if (event.keyCode == KEY_LEFT) {
-      previousStep();
-    } else if (event.keyCode == KEY_RIGHT) {
-      nextStep();
-    }
+  document.querySelector("#progress").innerHTML = out;
+  setProgressBar();
+  setDate();
+}
+
+/**
+ * Set the progress bar default properties
+ *
+ */
+function setProgressBar() {
+  /* The progress bar */
+  bar = document.querySelector("#bar");
+
+  isSound = true;
+
+  time = 0;
+
+  /* The progress bar size in percent */
+  width = 100;
+
+  /* The progression text nodes */
+  sequenceProgression = document.querySelector("#sequenceProgression");
+  totalProgression = document.querySelector("#totalProgression");
+
+  interval = setInterval(move, 10);
+
+  /* The percentage of the progress bar
+      * at which we must begin for the next step
+      */
+  stepStart = 0;
+
+  /* The current step index */
+  step = 0;
+
+  /* Percentage of progression that must be done each 0.01 sec */
+  marge = getMarge();
+
+  /* Checker for the progress state (running or not) */
+  isPaused = true;
+
+  /* Init the subtitle at launch */
+  setSubTitle(meeting.getSequence(0).title);
+}
+
+/**
+ * Get the progression marge for the bar according to the time needed
+ *
+ * @returns {number}
+ */
+function getMarge() {
+  return 1000 / (totalDuration * 60000);
+}
+
+/**
+ * Get the total duraiton of the progress bar
+ *
+ * @param {array} seq
+ */
+function getTotalDuration(seq) {
+  let total = 0;
+  for (let i in seq) {
+    total += seq[i].duration;
   }
 
-  /**
-   * Create the time progress bar node
-   * Append progress bars in it according to the array
-   * @param {array} arr
-   */
-  function initProgressBar(arr) {
-    setSequenceSize(arr);
+  return total;
+}
 
-    var out =
-      '<div id="bar" class="bar"></div> \
-    <span id="startText" class="progress-text">Start</span> ';
-    var i;
-    for (i = 0; i < arr.length; i++) {
-      out +=
-        '<div class="progress-bar progress-bar-striped \
-            progress-bar-animated ' +
-        arr[i].color +
-        '" \
-            role="progressbar" aria-valuemin="0" \
-            aria-valuemax="' +
-        totalDuration +
-        '" \
-            style="width:' +
-        arr[i].durationPercent +
-        "%; \
-            background-color:" +
-        arr[i].color +
-        ';">' +
-        arr[i].title +
-        "</div>";
-    }
+function percent(d) {
+  return parseFloat((d * 100 / totalDuration).toFixed(1));
+}
 
-    document.querySelector("#progress").innerHTML = out;
-    setProgressBar();
-    setDate();
+/**
+ * Split the progress bar into sequences according to the duration of each one
+ */
+function setSequenceSize() {
+  totalDuration = getTotalDuration(meeting.getSequences()) || 0;
+  let beginAt = 0;
+  for (let i in meeting.getSequences()) {
+    let sequence = meeting.getSequence(i);
+    sequence.durationPercent = percent(sequence.duration);
+    sequence.beginAt = beginAt;
+    sequence.endAt = beginAt + sequence.duration;
+    beginAt += sequence.duration;
+  }
+}
+
+/**
+ * Define the current date and display it in #date node
+ *
+ */
+function setDate() {
+  const currentDate = new Date();
+  let day = currentDate.getDate();
+  let month = currentDate.getMonth() + 1;
+  const year = currentDate.getFullYear();
+
+  if (day < 10) {
+    day = "0" + day;
   }
 
-  /**
-   * Set the progress bar default properties
-   *
-   */
-  function setProgressBar() {
-    /* The progress bar */
-    bar = document.querySelector("#bar");
-
-    time = 0;
-
-    /* The progress bar size in percent */
-    width = 100;
-
-    /* The progression text nodes */
-    sequenceProgression = document.querySelector("#sequenceProgression");
-    totalProgression = document.querySelector("#totalProgression");
-
-    interval = setInterval(move, 10);
-
-    /* The percentage of the progress bar
-        * at which we must begin for the next step
-        */
-    stepStart = 0;
-
-    /* The current step index */
-    step = 0;
-
-    /* Percentage of progression that must be done each 0.01 sec */
-    marge = getMarge();
-
-    /* Checker for the progress state (running or not) */
-    isPaused = true;
-
-    /* Init the subtitle at launch */
-    setSubTitle(sequences[0].title);
+  if (month < 10) {
+    month = "0" + month;
   }
+  const today = `${day}/${month}/${year}`;
 
-  /**
-   * Get the progression marge for the bar according to the time needed
-   *
-   * @returns {number}
-   */
-  function getMarge() {
-    return 1000 / (totalDuration * 60000);
-  }
-
-  /**
-   * Get the total duraiton of the progress bar
-   *
-   * @param {array} seq
-   */
-  function getTotalDuration(seq) {
-    let total = 0;
-    for (i in seq) {
-      total += seq[i].duration;
-    }
-
-    return total;
-  }
-
-  function percent(d) {
-    return parseFloat((d * 100 / totalDuration).toFixed(1));
-  }
-
-  /**
-   * Split the progress bar into sequences according to the duration of each one
-   */
-  function setSequenceSize() {
-    totalDuration = getTotalDuration(sequences) || 0;
-    let beginAt = 0;
-    for (i in sequences) {
-      let sequence = sequences[i];
-      sequence.durationPercent = percent(sequence.duration);
-      sequence.beginAt = beginAt;
-      sequence.endAt = beginAt + sequence.duration;
-      beginAt += sequence.duration;
-    }
-  }
-
-  /**
-   * Define the current date and display it in #date node
-   *
-   */
-  function setDate() {
-    const currentDate = new Date();
-    let day = currentDate.getDate();
-    let month = currentDate.getMonth() + 1;
-    const year = currentDate.getFullYear();
-
-    if (day < 10) {
-      day = "0" + day;
-    }
-
-    if (month < 10) {
-      month = "0" + month;
-    }
-    const today = `${day}/${month}/${year}`;
-
-    const date = document.querySelector("#date");
-    date.innerHTML = today;
-  }
-})();
+  const date = document.querySelector("#date");
+  date.innerHTML = today;
+}
 
 /**
  * Launch the progress bar
@@ -241,10 +277,11 @@ function move() {
 
       /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
       if (
-        sequences[step].durationPercent ===
+        meeting.getSequence(step).durationPercent ===
         parseFloat((100 - (width + stepStart)).toFixed(1))
       ) {
         updateBar();
+        playSound();
         //stop();
       }
     }
@@ -256,13 +293,13 @@ function move() {
  *
  */
 function updateBar() {
-  stepStart += sequences[step].durationPercent;
+  stepStart += meeting.getSequence(step).durationPercent;
   step++;
 
-  if (sequences[step]) {
-    setSubTitle(sequences[step].title);
-    if (sequences[step].extra) {
-      setExtra(sequences[step].extra);
+  if (meeting.getSequence(step)) {
+    setSubTitle(meeting.getSequence(step).title);
+    if (meeting.getSequence(step).extra) {
+      setExtra(meeting.getSequence(step).extra);
     } else {
       setExtra();
     }
@@ -277,7 +314,7 @@ function updateBar() {
  * @param {string} t
  */
 function setSubTitle(t) {
-  title = document.querySelector("#subtitle");
+  const title = document.querySelector("#subtitle");
   title.style.display = "none";
   title.innerHTML = t;
   setTimeout(function() {
@@ -292,7 +329,7 @@ function setSubTitle(t) {
  * @param {string} str
  */
 function setExtra(str) {
-  extra = document.querySelector("#extra");
+  const extra = document.querySelector("#extra");
   extra.style.display = "none";
 
   if (str) {
@@ -338,7 +375,7 @@ function updateRemainingTime(remainingPercent) {
   // Compute sequence remaining time
   let elapsedTimeInMilli = totalDuration * 600 * (100 - remainingPercent);
   elapsedTimeInMilli = elapsedTimeInMilli.toFixed(0);
-  let endAtInMilli = sequences[step].endAt * 60 * 1000;
+  let endAtInMilli = meeting.getSequence(step).endAt * 60 * 1000;
   endAtInMilli = endAtInMilli.toFixed(0);
   let setRemainInMilli = endAtInMilli - elapsedTimeInMilli;
   sequenceProgression.innerHTML = `${timeConversion(setRemainInMilli)}`;
@@ -386,8 +423,8 @@ function goToStep(s, force) {
 
   if (s === 0) {
     /* If step 1 running go back to step one begin*/
-    if (width < 100 - sequences[1].durationPercent && !force) {
-      stepStart = sequences[s].durationPercent;
+    if (width < 100 - meeting.getSequence(1).durationPercent && !force) {
+      stepStart = meeting.getSequence(s).durationPercent;
       s = step;
       /* Else refresh to the begining */
     } else {
@@ -395,13 +432,13 @@ function goToStep(s, force) {
     }
   } else {
     if (step < s) {
-      stepStart += sequences[step].durationPercent;
+      stepStart += meeting.getSequence(step).durationPercent;
     } else {
       /* If step not finished, refresh it instead of going back */
       if (width !== 100 - stepStart) {
         s = step;
       } else {
-        stepStart -= sequences[step - 1].durationPercent;
+        stepStart -= meeting.getSequence(step - 1).durationPercent;
       }
     }
   }
@@ -411,11 +448,11 @@ function goToStep(s, force) {
   bar.style.width = width + "%";
   updateRemainingTime(width);
 
-  if (sequences[step]) {
-    setSubTitle(sequences[step].title);
+  if (meeting.getSequence(step)) {
+    setSubTitle(meeting.getSequence(step).title);
 
-    if (sequences[step].extra) {
-      setExtra(sequences[step].extra);
+    if (meeting.getSequence(step).extra) {
+      setExtra(meeting.getSequence(step).extra);
     } else {
       setExtra();
     }
@@ -433,7 +470,7 @@ function previousStep() {
 }
 
 function nextStep() {
-  const nbStep = sequences.length;
+  const nbStep = meeting.getSequences().length;
   if (step !== nbStep) {
     goToStep(step + 1);
   }
@@ -467,3 +504,130 @@ function stop() {
 function restart() {
   goToStep(0, true);
 }
+
+function openSettings() {
+  document.querySelector('#settingsModal').style.display = "flex";
+}
+
+function closeSettings() {
+  document.querySelector('#settingsModal').style.display = "none";
+}
+
+/**
+ * Set a new meeting
+ *
+ */
+function setNewMeeting() {
+  const title = document.querySelector('#new-meeting-title').value;
+  const sequences = document.querySelector('#new-meeting-sequences');
+
+  // Refresh meeting
+  meeting = new Meeting(title);
+
+  // Add sequences
+  const j = sequences.childElementCount;
+  for(let i=0; i<j; i++) {
+    const child = sequences.children[i];
+    const kind = child.dataset.kind;
+    const inputs = child.children;
+    if(kind && kind === "step") {
+      const seqName = inputs[0].value;
+      const seqDuration = parseFloat(inputs[1].value);
+      const seqColor = inputs[2].value;
+      const seq = new Sequence(seqName, seqDuration, seqColor)
+      meeting.addSequence(seq);
+      console.log("Step added : "+seqName);
+    }
+  }
+
+  // FIXME - Should check the whole defined time instead of just one sequence
+  if(meeting.getSequences().length && (meeting.getSequence(0).duration > 0)) {
+    // Reset the page
+    setPage();
+    closeSettings();
+  } else {
+    alert("Please set a correct time :)");
+  }
+}
+
+/**
+ *  Add a new step form in meeting settings view
+ *
+ */
+function addStepForm() {
+  const sequences = document.querySelector('#new-meeting-sequences');
+  const seq = document.createElement("div");
+  seq.dataset.kind = "step";
+  seq.classList.add("sequences-table-line", "zoomIn");
+  // FIXME - Should use class instead of style
+  seq.innerHTML = `<input type="text" name="title" value="New step" style="width:250px; margin:0px 2px; text-align:left;"/>
+                    <input type="number" name="duration" min="0.1" value="0.1" style="width:100px; margin:0px 2px; text-align:left;"/>
+                    <select name="color" style="width:100px; margin:0px 2px; text-align:left;">
+                      <option value="blue">blue</option>
+                      <option value="red">red</option>
+                      <option value="green">green</option>
+                      <option value="yellow">yellow</option>
+                      <option value="purple">purple</option>
+                    </select>
+                    <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeStepForm()">
+                  </div>`;
+  sequences.appendChild(seq, sequences.lastElementChild);
+}
+
+/**
+ * Remove step form from meeting settings view
+ *
+ */
+function removeStepForm(i) {
+  const sequences = document.querySelector('#new-meeting-sequences');
+
+  sequences.removeChild(i);
+  //meeting.removeSequence(i)
+}
+
+/**
+ * Launch a sound once
+ *
+ */
+function playSound(){
+  if(isSound) {
+    const sound = document.querySelector('#sound');
+    sound.play();
+  }
+}
+
+/**
+ * Toggle sound and set sound icon
+ *
+ */
+function toggleSound() {
+  isSound = !isSound;
+
+  const soundManager = document.querySelector('#soundManager');
+  if(isSound) {
+    soundManager.setAttribute("src", "assets/icons/ic_volume_up.svg");
+  } else {
+    soundManager.setAttribute("src", "assets/icons/ic_volume_off.svg");
+  }
+}
+
+/* Register page shortcuts */
+document.addEventListener("keyup", doc_keyUp, false);
+
+/* Create the progress bar when them DOM has been initialised */
+document.addEventListener('DOMContentLoaded', function() {
+  loadMeeting("data");
+
+  // Bind module functions to window because of the scoped module
+  window.toggleStartPause = toggleStartPause;
+  window.loadMeeting = loadMeeting;
+  window.nextStep = nextStep;
+  window.previousStep = previousStep;
+  window.restart = restart;
+  window.addStepForm = addStepForm;
+  window.removeStepForm = removeStepForm;
+  window.setNewMeeting = setNewMeeting;
+  window.openSettings = openSettings;
+  window.closeSettings = closeSettings;
+  window.toggleSound = toggleSound;
+});

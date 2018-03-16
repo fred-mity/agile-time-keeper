@@ -16,10 +16,106 @@
 </head>
 
 <body>
+    <div id="loader-container" class="loader-container">
+        <div class="loader">
+            <div></div>
+            <div></div>
+        </div>
+    </div>
     <header>
         <h1 id="title" onclick="restart()" title="Click to restart"></h1>
         <span id="date"></span>
     </header>
+
+    <nav>
+        <div class="shortcuts-container fab-btn-container">
+            <div class="shortcuts-btn fab-btn" title="Legend">
+                <img src="assets/icons/ic_info.svg" alt="Info icon">
+            </div>
+            <div class="shortcuts fab-content">
+                <p>SPACE : START/PAUSE</p>
+                <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
+            </div>
+        </div>
+
+        <div class="sound-container fab-btn-container">
+            <div class="sound-btn fab-btn" title="Legend" onclick="toggleSound()">
+                <img src="assets/icons/ic_volume_up.svg" alt="Info icon" id="soundManager" >
+            </div>
+        </div>
+
+        <div class="templates-container fab-btn-container">
+            <div class="templates-btn fab-btn" title="Templates">
+                <img src="assets/icons/ic_list.svg" alt="List icon">
+            </div>
+            <div class="meeting-templates fab-content">
+                <span onclick="loadMeeting('data_15m')"
+                class="meeting-template" title="(2/10/3)">
+                    15min
+                </span>
+                <span onclick="loadMeeting('data_30m')"
+                class="meeting-template" title="(5/20/5)">
+                    30min
+                </span>
+                <span onclick="loadMeeting('data_1h')"
+                class="meeting-template" title="(5/45/5)">
+                    1H
+                </span>
+                <span onclick="loadMeeting('data_2h')"
+                class="meeting-template" title="(15/90/15)">
+                    2H
+                </span>
+            </div>
+        </div>
+
+        <div class="settings-container fab-btn-container">
+          <div class="settings-btn fab-btn" title="Set meeting" onclick="openSettings()">
+              <img src="assets/icons/ic_settings.svg" alt="Settings icon">
+          </div>
+          <div id="settingsModal" class="settings-modal">
+            <div class="settings">
+              <img src="assets/icons/ic_clear.svg" alt="Close icon" class="settings-close-btn default-btn" onclick="closeSettings()" alt="Close icon" onclick="removeStepForm(event)">
+              <!--<button type="button" class="settings-close-btn" onclick="closeSettings()">x</button>-->
+              <form method="dialog" id="meetings-form" class="settings-meeting-form">
+                <div class="meeting-form-title">
+                  <label for="new-meeting-title">Title</label>
+                  <input type="text" name="new-meeting-title" id="new-meeting-title"/>
+                </div>
+                <div class="meeting-form-sequences">
+                  <h3>Sequences</h3>
+                  <div class="sequences-table-line">
+                    <span class="table-line-max">Name</span>
+                    <span class="table-line-min">Time (min)</span>
+                    <span class="table-line-min">Color</span>
+                  </div>
+                  <div id="new-meeting-sequences">
+                    <div data-kind="step" class="sequences-table-line">
+                        <input type="text" name="title" value="New step" class="table-line-max"/>
+                        <input type="number" name="duration" min="0.1" value="0.1" class="table-line-min"/>
+                        <select name="color" class="table-line-min">
+                          <option value="blue">blue</option>
+                          <option value="red">red</option>
+                          <option value="green">green</option>
+                          <option value="yellow">yellow</option>
+                          <option value="purple">purple</option>
+                        </select>
+                        <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeStepForm()">
+                        <!--<button type="button" onclick="removeStepForm(event)">X</button>-->
+                    </div>
+                  </div>
+                </div>
+                <div class="meetings-form-btns">
+                  <img src="assets/icons/ic_add.svg" alt="Add icon" class="default-btn" onclick="addStepForm()">
+                  <img src="assets/icons/ic_forward.svg" alt="Forward icon" class="default-btn" onclick="setNewMeeting()">
+
+                  <!--<button type="button" onclick="addStepForm()">Add new</button>
+                  <button type="button" onclick="setNewMeeting()">Done</button>-->
+                </div>
+              </form>
+            </div>
+          </div>
+      </div>
+    </nav>
 
     <div class="bar-container">
         <div class="subtitle-container sub-container">
@@ -31,13 +127,13 @@
             <span class="progression-title title-bottom">step</span>
         </div>
         <div class="time-container sub-container">
-          <div class="progression progression-top">
-              <span class="time-container-label">remaining</span>
-              <span id="totalProgression">-</span>
+            <div class="progression progression-top">
+                <span class="time-container-label">remaining</span>
+                <span id="totalProgression">-</span>
             </div>
             <div class="progression progression-bottom">
                 <span class="time-container-label">remaining</span>
-              <span id="sequenceProgression">-</span>
+                <span id="sequenceProgression">-</span>
             </div>
             <!--<button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>-->
         </div>
@@ -48,10 +144,10 @@
 
     <div class="btn-container">
         <button onclick="previousStep()" type="button" class="btn btn-secondary" title="Previous step">
-            <img src="icons/ic_skip_previous.svg" alt="Previous icon">
+            <img src="assets/icons/ic_skip_previous.svg" alt="Previous icon">
         </button>
         <button onclick="nextStep()" type="button" class="btn btn-secondary" title="Next step">
-            <img src="icons/ic_skip_next.svg" alt="Next icon">
+            <img src="assets/icons/ic_skip_next.svg" alt="Next icon">
         </button>
     </div>
 
@@ -59,15 +155,7 @@
         <div id="extra" class="extra zoomIn"></div>
     </article>
 
-    <div class="shortcuts-container">
-      <div class="shortcuts-btn">
-        <img src="icons/ic_info.svg" alt="Next icon">
-      </div>
-      <div class="shortcuts">
-        <p>SPACE : START/PAUSE</p>
-        <p>&#8592; / &#8594; : PREVIOUS/NEXT STEP</p>
-      </div>
-    </div>
+    <audio id="sound" src="assets/sounds/tong.mp3"></audio>
 
     <!--<footer>
         <small>
@@ -81,7 +169,7 @@
         </small>
     </footer>-->
 
-    <script type="text/javascript" src="scripts/index.js"></script>
+    <script type="module" src="scripts/index.js"></script>
 </body>
 
 </html>
