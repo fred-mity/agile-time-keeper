@@ -1,5 +1,5 @@
-import { meeting } from './models/meeting.js';
-import { sequence } from './models/sequence.js';
+import { Meeting } from './models/meeting.js';
+import { Sequence } from './models/sequence.js';
 
 /**
  * Main properties :
@@ -8,7 +8,7 @@ import { sequence } from './models/sequence.js';
  * {function} interval
  * {properties} width, time, step, stepStart, isPaused, marge
  */
-let sequences,
+let meeting,
   interval,
   bar,
   totalProgression,
@@ -19,7 +19,8 @@ let sequences,
   step,
   stepStart,
   totalDuration,
-  isPaused;
+  isPaused,
+  isSound;
 
 /* Those key values have been tested on MAC OS */
 const KEY_SPACE = 32;
@@ -42,7 +43,9 @@ function loadMeeting(meetingName) {
     }
     if (this.readyState == 4 && this.status == 200) {
       const res = JSON.parse(this.responseText);
-      setPage(res);
+      meeting = new Meeting(res.title, res.sequences);
+
+      setPage();
       load(false);
     }
   };
@@ -55,16 +58,26 @@ function loadMeeting(meetingName) {
  * Set the page content
  *
  */
-function setPage(res) {
-  document.querySelector("#title").innerHTML = res.title;
-  document.querySelector("#date").innerHTML = res.date;
+function setPage() {
+  // Set current date
+  const today = new Date();
 
-  sequences = res.sequences;
+  const d = today.getDay();
+  const m = today.getMonth();
+  const y = today.getFullYear();
+
+  const todayStr = `${(d <= 9 ? '0' + d : d)}/${(m <= 9 ? '0' + m : m)}/${y}`
+
+  // Set title and date
+  document.querySelector("#title").innerHTML = meeting.title;
+  document.querySelector("#date").innerHTML = todayStr;
+
+  // Init progress bar
   if (interval) {
     clearInterval(interval);
     interval = undefined;
   }
-  initProgressBar(sequences);
+  initProgressBar(meeting.getSequences());
 }
 
 function load(bool) {
@@ -149,6 +162,8 @@ function setProgressBar() {
   /* The progress bar */
   bar = document.querySelector("#bar");
 
+  isSound = true;
+
   time = 0;
 
   /* The progress bar size in percent */
@@ -175,7 +190,7 @@ function setProgressBar() {
   isPaused = true;
 
   /* Init the subtitle at launch */
-  setSubTitle(sequences[0].title);
+  setSubTitle(meeting.getSequence(0).title);
 }
 
 /**
@@ -209,10 +224,10 @@ function percent(d) {
  * Split the progress bar into sequences according to the duration of each one
  */
 function setSequenceSize() {
-  totalDuration = getTotalDuration(sequences) || 0;
+  totalDuration = getTotalDuration(meeting.getSequences()) || 0;
   let beginAt = 0;
-  for (let i in sequences) {
-    let sequence = sequences[i];
+  for (let i in meeting.getSequences()) {
+    let sequence = meeting.getSequence(i);
     sequence.durationPercent = percent(sequence.duration);
     sequence.beginAt = beginAt;
     sequence.endAt = beginAt + sequence.duration;
@@ -262,10 +277,11 @@ function move() {
 
       /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
       if (
-        sequences[step].durationPercent ===
+        meeting.getSequence(step).durationPercent ===
         parseFloat((100 - (width + stepStart)).toFixed(1))
       ) {
         updateBar();
+        playSound();
         //stop();
       }
     }
@@ -277,13 +293,13 @@ function move() {
  *
  */
 function updateBar() {
-  stepStart += sequences[step].durationPercent;
+  stepStart += meeting.getSequence(step).durationPercent;
   step++;
 
-  if (sequences[step]) {
-    setSubTitle(sequences[step].title);
-    if (sequences[step].extra) {
-      setExtra(sequences[step].extra);
+  if (meeting.getSequence(step)) {
+    setSubTitle(meeting.getSequence(step).title);
+    if (meeting.getSequence(step).extra) {
+      setExtra(meeting.getSequence(step).extra);
     } else {
       setExtra();
     }
@@ -359,7 +375,7 @@ function updateRemainingTime(remainingPercent) {
   // Compute sequence remaining time
   let elapsedTimeInMilli = totalDuration * 600 * (100 - remainingPercent);
   elapsedTimeInMilli = elapsedTimeInMilli.toFixed(0);
-  let endAtInMilli = sequences[step].endAt * 60 * 1000;
+  let endAtInMilli = meeting.getSequence(step).endAt * 60 * 1000;
   endAtInMilli = endAtInMilli.toFixed(0);
   let setRemainInMilli = endAtInMilli - elapsedTimeInMilli;
   sequenceProgression.innerHTML = `${timeConversion(setRemainInMilli)}`;
@@ -407,8 +423,8 @@ function goToStep(s, force) {
 
   if (s === 0) {
     /* If step 1 running go back to step one begin*/
-    if (width < 100 - sequences[1].durationPercent && !force) {
-      stepStart = sequences[s].durationPercent;
+    if (width < 100 - meeting.getSequence(1).durationPercent && !force) {
+      stepStart = meeting.getSequence(s).durationPercent;
       s = step;
       /* Else refresh to the begining */
     } else {
@@ -416,13 +432,13 @@ function goToStep(s, force) {
     }
   } else {
     if (step < s) {
-      stepStart += sequences[step].durationPercent;
+      stepStart += meeting.getSequence(step).durationPercent;
     } else {
       /* If step not finished, refresh it instead of going back */
       if (width !== 100 - stepStart) {
         s = step;
       } else {
-        stepStart -= sequences[step - 1].durationPercent;
+        stepStart -= meeting.getSequence(step - 1).durationPercent;
       }
     }
   }
@@ -432,11 +448,11 @@ function goToStep(s, force) {
   bar.style.width = width + "%";
   updateRemainingTime(width);
 
-  if (sequences[step]) {
-    setSubTitle(sequences[step].title);
+  if (meeting.getSequence(step)) {
+    setSubTitle(meeting.getSequence(step).title);
 
-    if (sequences[step].extra) {
-      setExtra(sequences[step].extra);
+    if (meeting.getSequence(step).extra) {
+      setExtra(meeting.getSequence(step).extra);
     } else {
       setExtra();
     }
@@ -454,7 +470,7 @@ function previousStep() {
 }
 
 function nextStep() {
-  const nbStep = sequences.length;
+  const nbStep = meeting.getSequences().length;
   if (step !== nbStep) {
     goToStep(step + 1);
   }
@@ -489,6 +505,112 @@ function restart() {
   goToStep(0, true);
 }
 
+function openSettings() {
+  document.querySelector('#settingsModal').style.display = "flex";
+}
+
+function closeSettings() {
+  document.querySelector('#settingsModal').style.display = "none";
+}
+
+/**
+ * Set a new meeting
+ *
+ */
+function setNewMeeting() {
+  const title = document.querySelector('#new-meeting-title').value;
+  const sequences = document.querySelector('#new-meeting-sequences');
+
+  // Refresh meeting
+  meeting = new Meeting(title);
+
+  // Add sequences
+  const j = sequences.childElementCount;
+  for(let i=0; i<j; i++) {
+    const child = sequences.children[i];
+    const kind = child.dataset.kind;
+    const inputs = child.children;
+    if(kind && kind === "step") {
+      const seqName = inputs[0].value;
+      const seqDuration = parseFloat(inputs[1].value);
+      const seqColor = inputs[2].value;
+      const seq = new Sequence(seqName, seqDuration, seqColor)
+      meeting.addSequence(seq);
+      console.log("Step added : "+seqName);
+    }
+  }
+
+  // FIXME - Should check the whole defined time instead of just one sequence
+  if(meeting.getSequences().length && (meeting.getSequence(0).duration > 0)) {
+    // Reset the page
+    setPage();
+    closeSettings();
+  } else {
+    alert("Please set a correct time :)");
+  }
+}
+
+/**
+ *  Add a new step form in meeting settings view
+ *
+ */
+function addStepForm() {
+  const sequences = document.querySelector('#new-meeting-sequences');
+  const seq = document.createElement("div");
+  seq.dataset.kind = "step";
+  seq.classList.add("sequences-table-line", "zoomIn");
+  // FIXME - Should use class instead of style
+  seq.innerHTML = `<input type="text" name="title" value="New step" style="width:250px; margin:0px 2px; text-align:left;"/>
+                    <input type="number" name="duration" min="0.1" value="0.1" style="width:100px; margin:0px 2px; text-align:left;"/>
+                    <select name="color" style="width:100px; margin:0px 2px; text-align:left;">
+                      <option value="blue">blue</option>
+                      <option value="red">red</option>
+                      <option value="green">green</option>
+                      <option value="yellow">yellow</option>
+                      <option value="purple">purple</option>
+                    </select>
+                    <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeStepForm()">
+                  </div>`;
+  sequences.appendChild(seq, sequences.lastElementChild);
+}
+
+/**
+ * Remove step form from meeting settings view
+ *
+ */
+function removeStepForm(i) {
+  const sequences = document.querySelector('#new-meeting-sequences');
+
+  sequences.removeChild(i);
+  //meeting.removeSequence(i)
+}
+
+/**
+ * Launch a sound once
+ *
+ */
+function playSound(){
+  if(isSound) {
+    const sound = document.querySelector('#sound');
+    sound.play();
+  }
+}
+
+/**
+ * Toggle sound and set sound icon
+ *
+ */
+function toggleSound() {
+  isSound = !isSound;
+
+  const soundManager = document.querySelector('#soundManager');
+  if(isSound) {
+    soundManager.setAttribute("src", "assets/icons/ic_volume_up.svg");
+  } else {
+    soundManager.setAttribute("src", "assets/icons/ic_volume_off.svg");
+  }
+}
+
 /* Register page shortcuts */
 document.addEventListener("keyup", doc_keyUp, false);
 
@@ -502,46 +624,10 @@ document.addEventListener('DOMContentLoaded', function() {
   window.nextStep = nextStep;
   window.previousStep = previousStep;
   window.restart = restart;
-  window.addStep = addStep;
+  window.addStepForm = addStepForm;
+  window.removeStepForm = removeStepForm;
   window.setNewMeeting = setNewMeeting;
+  window.openSettings = openSettings;
+  window.closeSettings = closeSettings;
+  window.toggleSound = toggleSound;
 });
-
-function setNewMeeting() {
-  const form = document.querySelector('#meetings-form');
-  const title = form.querySelector('#new-meeting-title').value;
-
-  const meeting = new meeting(title);
-
-  const j = form.childrenElementCount;
-  for(let i=0; i<j; i++) {
-    const child = form.children[i];
-    const kind = child.dataset.kind;
-    if(kind && kind === "step") {
-      const stepName = child.childNodes[0].nodeValue;
-      const stepDuration = child.childNodes[1].nodeValue;
-      const stepColor = child.childNodes[2].nodeValue;
-      const step = new sequence(stepName, stepDuration, stepColor)
-      meeting.addStep(step);
-      console.log("Step added : "+stepName);
-    }
-  }
-
-  setPage(meeting);
-}
-
-function addStep() {
-  const form = document.querySelector('#meetings-form');
-  const seq = document.createElement("div");
-  seq.dataset.kind = "step";
-  seq.innerHTML = `<input type="text" name="title" value="New step"/>
-                    <input type="number" name="duration" value="0"/>
-                    <select name="color">
-                      <option value="blue">blue</option>
-                      <option value="red">red</option>
-                      <option value="green">green</option>
-                      <option value="yellow">yellow</option>
-                      <option value="purple">purple</option>
-                    </select>
-                  </div>`;
-  form.insertBefore(seq, form.lastElementChild);
-}
