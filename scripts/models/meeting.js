@@ -1,4 +1,4 @@
-export class meeting {
+export class Meeting {
   constructor(title, sequences) {
     this.title = title || 'New meeting';
     this.sequences = sequences || [];
@@ -10,6 +10,10 @@ export class meeting {
 
   getSequences() {
     return this.sequences;
+  }
+
+  getSequence(i) {
+    return this.sequences[i];
   }
 
   setTitle(t) {
