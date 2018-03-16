@@ -2,7 +2,7 @@
 
 This project permits to display a time keeper companion that help you track time sequence in a meeting.
 
-![ATK screen](images/atk_screenshot.png)
+![ATK screen](assets/images/atk_screenshot.png)
 
 ## Serve the pages
 
