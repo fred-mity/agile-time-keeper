@@ -11,8 +11,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <base href="./">
+<<<<<<< Updated upstream
     <link rel="stylesheet" href="styles/index.css">
     <link rel="stylesheet" href="styles/bootstrap.min.css">
+=======
+    <link rel="stylesheet" href="styles/anim.css">
+    <link rel="stylesheet" href="styles/colors.css">
+    <link rel="stylesheet" href="styles/bootstrap.min.css">
+    <link rel="stylesheet" media="screen" href="styles/screen.css">
+    <link rel="stylesheet" media="screen" href="styles/media.css">
+    <link rel="stylesheet" media="handheld" href="styles/handheld.css">
+
+    <link rel="import" href="templates/sequence.html">
+>>>>>>> Stashed changes
 </head>
 
 <body>
@@ -49,19 +60,19 @@
                 <img src="assets/icons/ic_list.svg" alt="List icon">
             </div>
             <div class="meeting-templates fab-content">
-                <span onclick="loadMeeting('data_15m')"
+                <span onclick="loadMeetingFromJson('data_15m')"
                 class="meeting-template" title="(2/10/3)">
                     15min
                 </span>
-                <span onclick="loadMeeting('data_30m')"
+                <span onclick="loadMeetingFromJson('data_30m')"
                 class="meeting-template" title="(5/20/5)">
                     30min
                 </span>
-                <span onclick="loadMeeting('data_1h')"
+                <span onclick="loadMeetingFromJson('data_1h')"
                 class="meeting-template" title="(5/45/5)">
                     1H
                 </span>
-                <span onclick="loadMeeting('data_2h')"
+                <span onclick="loadMeetingFromJson('data_2h')"
                 class="meeting-template" title="(15/90/15)">
                     2H
                 </span>
@@ -75,7 +86,6 @@
           <div id="settingsModal" class="settings-modal">
             <div class="settings">
               <img src="assets/icons/ic_clear.svg" alt="Close icon" class="settings-close-btn default-btn" onclick="closeSettings()" alt="Close icon" onclick="removeStepForm(event)">
-              <!--<button type="button" class="settings-close-btn" onclick="closeSettings()">x</button>-->
               <form method="dialog" id="meetings-form" class="settings-meeting-form">
                 <div class="meeting-form-title">
                   <label for="new-meeting-title">Title</label>
@@ -89,27 +99,12 @@
                     <span class="table-line-min">Color</span>
                   </div>
                   <div id="new-meeting-sequences">
-                    <div data-kind="step" class="sequences-table-line">
-                        <input type="text" name="title" value="New step" class="table-line-max"/>
-                        <input type="number" name="duration" min="0.1" value="0.1" class="table-line-min"/>
-                        <select name="color" class="table-line-min">
-                          <option value="blue">blue</option>
-                          <option value="red">red</option>
-                          <option value="green">green</option>
-                          <option value="yellow">yellow</option>
-                          <option value="purple">purple</option>
-                        </select>
-                        <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeStepForm()">
-                        <!--<button type="button" onclick="removeStepForm(event)">X</button>-->
-                    </div>
+                    <!-- filled with addSeq method -->
                   </div>
                 </div>
                 <div class="meetings-form-btns">
-                  <img src="assets/icons/ic_add.svg" alt="Add icon" class="default-btn" onclick="addStepForm()">
-                  <img src="assets/icons/ic_forward.svg" alt="Forward icon" class="default-btn" onclick="setNewMeeting()">
-
-                  <!--<button type="button" onclick="addStepForm()">Add new</button>
-                  <button type="button" onclick="setNewMeeting()">Done</button>-->
+                  <img src="assets/icons/ic_add.svg" alt="Add icon" class="default-btn" onclick="addSeqForm()">
+                  <img src="assets/icons/ic_forward.svg" alt="Forward icon" class="default-btn" onclick="applyForNewMeeting()">
                 </div>
               </form>
             </div>
@@ -135,7 +130,6 @@
                 <span class="time-container-label">remaining</span>
                 <span id="sequenceProgression">-</span>
             </div>
-            <!--<button id="startBtn" onclick="toggleStartPause()" type="button" class="btn btn-primary">Start</button>-->
         </div>
         <div id="progress" class="progress" onclick="toggleStartPause()">
             <!-- Should contains bars for sequences -->
