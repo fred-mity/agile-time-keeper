@@ -2,24 +2,24 @@
     "title": "Agile Meeting",
     "sequences": [
         {
-            "title": "Introduction",
+            "title": "Iron man",
             "duration": 0.1,
             "color": "red"
         },
         {
-            "title": "First Topic",
+            "title": "Superman",
             "duration": 0.2,
             "color": "purple",
             "extra": "extra content is extra cool !"
         },
         {
-            "title": "Second Topic",
+            "title": "Batman",
             "duration": 0.4,
             "color": "blue",
             "extra": "A major topic that takes time"
         },
         {
-            "title": "Conclusion",
+            "title": "Hulk",
             "duration": 0.5,
             "color": "green"
         }
