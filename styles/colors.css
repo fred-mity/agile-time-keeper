@@ -1,0 +1,32 @@
+/* Colors */
+.progress-bar.red {
+  background-color: #f44336;
+}
+
+.progress-bar.blue {
+  background-color: #03a9f4;
+}
+
+.progress-bar.green {
+  background-color: #4caf50;
+}
+
+.progress-bar.yellow {
+  background-color: #ffc107;
+}
+
+.progress-bar.purple {
+  background-color: #673ab7;
+}
+
+.progress-bar.pink {
+  background-color: #E91E63;
+}
+
+.progress-bar.indigo {
+  background-color: #3F51B5;
+}
+
+.progress-bar.orange {
+  background-color: #FF9800;
+}

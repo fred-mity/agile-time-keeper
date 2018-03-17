@@ -1,12 +1,12 @@
 import { Meeting } from './models/meeting.js';
 import { Sequence } from './models/sequence.js';
 
-/**
- * Main properties :
- * {html nodes} bar and progression
- * {data} sequences
+/*
+ * Main global properties :
+ * {html nodes} bar and time progression
  * {function} interval
- * {properties} width, time, step, stepStart, isPaused, marge
+ * {object} meeting
+ * {properties} width, time, marge, step, stepStart, isPaused, isSound, sequenceForm
  */
 let meeting,
   interval,
@@ -19,43 +19,26 @@ let meeting,
   step,
   stepStart,
   totalDuration,
-  isPaused,
+  isPaused,sequenceForm,
   isSound;
 
-/* Those key values have been tested on MAC OS */
-const KEY_SPACE = 32;
-const KEY_LEFT = 37;
-const KEY_RIGHT = 39;
+
+// INITIALISATION -------------------------------------------------
 
 /**
- * Load a meeting template
+ * Init our ATK page
  *
- * @param {string} meetingName
  */
-function loadMeeting(meetingName) {
-  // load a meeting template with given name
-  const xmlhttp = new XMLHttpRequest();
-  const url = `meetings/${meetingName}.json`;
+function init() {
+  loadMeetingFromJson('data');
 
-  xmlhttp.onreadystatechange = function() {
-    if(this.readyState == 1) {
-      load(true);
-    }
-    if (this.readyState == 4 && this.status == 200) {
-      const res = JSON.parse(this.responseText);
-      meeting = new Meeting(res.title, res.sequences);
-
-      setPage();
-      load(false);
-    }
-  };
-
-  xmlhttp.open("GET", url, true);
-  xmlhttp.send();
-};
+  // Keep our sequence UI forms (for modification purpose)
+  sequenceForm = [];
+}
 
 /**
  * Set the page content
+ * : title, current date,
  *
  */
 function setPage() {
@@ -77,9 +60,46 @@ function setPage() {
     clearInterval(interval);
     interval = undefined;
   }
-  initProgressBar(meeting.getSequences());
+  initProgressBarUI(meeting.getSequences());
+
+  if(!sequenceForm.length) {
+    // Add a first sequence to settings view
+    addSeqForm();
+  }
 }
 
+/**
+ * Load a meeting template JSON
+ *
+ * @param {string} fileName
+ */
+function loadMeetingFromJson(fileName) {
+  // load a meeting template with given name
+  const xmlhttp = new XMLHttpRequest();
+  const url = `meetings/${fileName}.json`;
+
+  xmlhttp.onreadystatechange = function() {
+    if(this.readyState == 1) {
+      load(true);
+    }
+    if (this.readyState == 4 && this.status == 200) {
+      const res = JSON.parse(this.responseText);
+      meeting = new Meeting(res.title, res.sequences);
+
+      setPage();
+      load(false);
+    }
+  };
+
+  xmlhttp.open("GET", url, true);
+  xmlhttp.send();
+};
+
+/**
+ * Toggle loader
+ *
+ * @param {any} bool
+ */
 function load(bool) {
   const loader = document.querySelector('#loader-container');
   if(bool) {
@@ -90,37 +110,11 @@ function load(bool) {
 }
 
 /**
- * This function is called on a document key_up
- * Code the shortcuts here
- */
-function doc_keyUp(event) {
-  console.log("You pressed", event.keyCode);
-  if (event.keyCode == KEY_SPACE) {
-    ///
-    // SPACE toggle start/pause
-    ///
-    // We must prevent SPACE default behavior
-    // because if we don't SPACE bar will also push on any selected element
-    // For example, if START button is selected, you push SPACE then
-    // toggleStartPause is called
-    // then button is pushed by the event chain and
-    // then timer is toggled another time
-    event.preventDefault();
-    // And at last, toggle the clock
-    toggleStartPause();
-  } else if (event.keyCode == KEY_LEFT) {
-    previousStep();
-  } else if (event.keyCode == KEY_RIGHT) {
-    nextStep();
-  }
-}
-
-/**
- * Create the time progress bar node
+ * Create the time progress bar view
  * Append progress bars in it according to the array
  * @param {array} arr
  */
-function initProgressBar(arr) {
+function initProgressBarUI(arr) {
   setSequenceSize(arr);
 
   let out =
@@ -150,47 +144,58 @@ function initProgressBar(arr) {
   }
 
   document.querySelector("#progress").innerHTML = out;
-  setProgressBar();
+
+
+  setProgressBarProperties();
   setDate();
 }
 
 /**
- * Set the progress bar default properties
+ * Initialise progression interval mechanism
  *
  */
-function setProgressBar() {
-  /* The progress bar */
+function initProgressionMainProperties() {
+  // REUSABLE NODES USED IN INTERVAL
+  // The progress bar node
   bar = document.querySelector("#bar");
-
-  isSound = true;
-
-  time = 0;
-
-  /* The progress bar size in percent */
-  width = 100;
-
-  /* The progression text nodes */
+  // The progression text nodes (timers)
   sequenceProgression = document.querySelector("#sequenceProgression");
   totalProgression = document.querySelector("#totalProgression");
 
-  interval = setInterval(move, 10);
+  interval = setInterval(progress, 10);
+}
 
-  /* The percentage of the progress bar
-      * at which we must begin for the next step
-      */
+/**
+ * Init the progress bar default properties
+ *
+ */
+function setProgressBarProperties() {
+  // Default start time
+  time = 0;
+
+  // The progress bar size in percent
+  width = 100;
+
+  // The percentage of the progress bar
+  // at which we must begin for the next step
   stepStart = 0;
 
-  /* The current step index */
+  // The current step index
   step = 0;
 
-  /* Percentage of progression that must be done each 0.01 sec */
+  // Percentage of progression that must be done each 0.01 sec
   marge = getMarge();
 
-  /* Checker for the progress state (running or not) */
+  // Checker for the progress state (running or not)
   isPaused = true;
 
-  /* Init the subtitle at launch */
+  // Checker for the sound (mute or not)
+  isSound = true;
+
+  // Init the subtitle at launch
   setSubTitle(meeting.getSequence(0).title);
+
+  initProgressionMainProperties();
 }
 
 /**
@@ -203,11 +208,11 @@ function getMarge() {
 }
 
 /**
- * Get the total duraiton of the progress bar
+ * Get the total duration of the progress bar according to sequences durations
  *
  * @param {array} seq
  */
-function getTotalDuration(seq) {
+function determineTotalDuration(seq) {
   let total = 0;
   for (let i in seq) {
     total += seq[i].duration;
@@ -224,7 +229,7 @@ function percent(d) {
  * Split the progress bar into sequences according to the duration of each one
  */
 function setSequenceSize() {
-  totalDuration = getTotalDuration(meeting.getSequences()) || 0;
+  totalDuration = determineTotalDuration(meeting.getSequences()) || 0;
   let beginAt = 0;
   for (let i in meeting.getSequences()) {
     let sequence = meeting.getSequence(i);
@@ -232,6 +237,71 @@ function setSequenceSize() {
     sequence.beginAt = beginAt;
     sequence.endAt = beginAt + sequence.duration;
     beginAt += sequence.duration;
+  }
+}
+
+/**
+ * Launch the progress bar
+ * : reduce the bar width from 100 to 0
+ */
+function progress() {
+  if (!isPaused) {
+    /* 0 < width < 100 */
+    if (width <= 0) {
+      clearInterval(interval);
+    } else {
+      width = width - marge;
+      time += 10;
+      bar.style.width = width + "%";
+      //updateTime(width);
+      updateRemainingTime(width);
+      // Only used in case of percentage progression instead of time
+      //updatePercent(width);
+
+      /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
+      if (
+        meeting.getSequence(step).durationPercent ===
+        parseFloat((100 - (width + stepStart)).toFixed(1))
+      ) {
+        updateBar();
+        playSound();
+        //stop();
+      }
+    }
+  }
+}
+
+// UPDATE UI -------------------------------------------------
+
+/**
+ * Redefine the page subtitle with the current sequence name
+ *
+ * @param {string} seqName
+ */
+function setSubTitle(seqName) {
+  const title = document.querySelector("#subtitle");
+  title.style.display = "none";
+  title.innerHTML = seqName;
+  setTimeout(function() {
+    title.style.display = "block";
+  }, 100);
+}
+
+/**
+ * Define the page extra content
+ * : Hide the container if no param defined
+ *
+ * @param {string} str
+ */
+function setExtra(str) {
+  const extra = document.querySelector("#extra");
+  extra.style.display = "none";
+
+  if (str) {
+    extra.innerHTML = str;
+    setTimeout(function() {
+      extra.style.display = "block";
+    }, 100);
   }
 }
 
@@ -259,36 +329,6 @@ function setDate() {
 }
 
 /**
- * Launch the progress bar
- * : reduce the #bar width from 100 to 0
- */
-function move() {
-  if (!isPaused) {
-    /* 0 < width < 100 */
-    if (width <= 0) {
-      clearInterval(interval);
-    } else {
-      width = width - marge;
-      time += 10;
-      bar.style.width = width + "%";
-      //updateTime(width);
-      updateRemainingTime(width);
-      //updatePercent(width);
-
-      /* parseFloat((100 - (width + stepStart)).toFixed(1)) is equal to the percentage of the current progression */
-      if (
-        meeting.getSequence(step).durationPercent ===
-        parseFloat((100 - (width + stepStart)).toFixed(1))
-      ) {
-        updateBar();
-        playSound();
-        //stop();
-      }
-    }
-  }
-}
-
-/**
  * Update progress bar properties
  *
  */
@@ -309,39 +349,7 @@ function updateBar() {
 }
 
 /**
- * Define the page subtitle according to the current sequence
- *
- * @param {string} t
- */
-function setSubTitle(t) {
-  const title = document.querySelector("#subtitle");
-  title.style.display = "none";
-  title.innerHTML = t;
-  setTimeout(function() {
-    title.style.display = "block";
-  }, 100);
-}
-
-/**
- * Define the page extra content
- * : Hide the container if no param defined
- *
- * @param {string} str
- */
-function setExtra(str) {
-  const extra = document.querySelector("#extra");
-  extra.style.display = "none";
-
-  if (str) {
-    extra.innerHTML = str;
-    setTimeout(function() {
-      extra.style.display = "block";
-    }, 100);
-  }
-}
-
-/**
- * Update #progression node value
+ * Update total progression node value (with percent value)
  * : append percent progression
  *
  * @param {number} p
@@ -351,7 +359,7 @@ function updatePercent(p) {
 }
 
 /**
- * Update #progression node value
+ * Update total progression node value
  * : append remaining time
  *
  * @param {number} p
@@ -362,7 +370,7 @@ function updateTime(p) {
 }
 
 /**
- * Update #progression node value
+ * Update remaining progression node value
  * : append time progression
  *
  * @param {number} remainingPercent
@@ -412,8 +420,10 @@ function timeConversion(millisec) {
   return timeString;
 }
 
+// PROGRESSION MOVE -------------------------------------------------
+
 /**
- * Move the progress bar to a defined sequence start
+ * Move the progress bar current time to a new defined sequence
  *
  * @param {number} s
  * @param {boolean} force
@@ -459,6 +469,9 @@ function goToStep(s, force) {
   }
 }
 
+/**
+ * Return to our timer previous sequence
+ */
 function previousStep() {
   if (step !== 0) {
     goToStep(step - 1);
@@ -469,6 +482,9 @@ function previousStep() {
   }
 }
 
+/**
+ * Go to our timer next sequence
+ */
 function nextStep() {
   const nbStep = meeting.getSequences().length;
   if (step !== nbStep) {
@@ -497,56 +513,96 @@ function toggleStartPause(v) {
   }
 }
 
+/**
+ * Clear our timer
+ *
+ */
 function stop() {
   clearInterval(interval);
 }
 
+/**
+ * Restart timer (go to the first sequence)
+ *
+ */
 function restart() {
   goToStep(0, true);
 }
 
+
+// SETTINGS VIEW -------------------------------------------------
+
+/**
+ * Open new settings view modal
+ *
+ */
 function openSettings() {
+  //readFiles();
   document.querySelector('#settingsModal').style.display = "flex";
 }
 
+/**
+ * Close new settings view modal
+ *
+ */
 function closeSettings() {
   document.querySelector('#settingsModal').style.display = "none";
 }
 
 /**
- * Set a new meeting
+ * Create a new meeting using new meeting view elements
  *
+ * @param {string} title
+ * @param {array} sequences
+ * @returns {Meeting} newMeeting
  */
-function setNewMeeting() {
-  const title = document.querySelector('#new-meeting-title').value;
-  const sequences = document.querySelector('#new-meeting-sequences');
+function createMeeting(title, sequences) {
+  const newMeeting = new Meeting();
 
-  // Refresh meeting
-  meeting = new Meeting(title);
+  if(sequences) {
+    if(title) {
+      newMeeting.setTitle(title);
+    }
 
-  // Add sequences
-  const j = sequences.childElementCount;
-  for(let i=0; i<j; i++) {
-    const child = sequences.children[i];
-    const kind = child.dataset.kind;
-    const inputs = child.children;
-    if(kind && kind === "step") {
+    // Create and add sequences
+    const j = sequences.childElementCount;
+    for(let i=0; i<j; i++) {
+      const child = sequences.children[i];
+      const kind = child.dataset.kind;
+      const inputs = child.children;
       const seqName = inputs[0].value;
       const seqDuration = parseFloat(inputs[1].value);
       const seqColor = inputs[2].value;
+      // Create the new sequence object
       const seq = new Sequence(seqName, seqDuration, seqColor)
-      meeting.addSequence(seq);
-      console.log("Step added : "+seqName);
+      // Add it to our new meeting
+      newMeeting.addSequence(seq);
+      //console.log("Sequence added : "+seqName);
     }
   }
+
+  return newMeeting;
+}
+
+/**
+ * Set a new meeting from our settings view and refresh the page accordingly
+ * Close the settings view when done
+ *
+ */
+function applyForNewMeeting() {
+  // Get new meeting modal values
+  const title = document.querySelector('#new-meeting-title').value;
+  const sequences = document.querySelector('#new-meeting-sequences');
+
+  // Create the new meeting object
+  meeting = createMeeting(title, sequences);
 
   // FIXME - Should check the whole defined time instead of just one sequence
   if(meeting.getSequences().length && (meeting.getSequence(0).duration > 0)) {
     // Reset the page
     setPage();
+    // Close settings view
     closeSettings();
-  } else {
-    alert("Please set a correct time :)");
   }
 }
 
@@ -554,36 +610,36 @@ function setNewMeeting() {
  *  Add a new step form in meeting settings view
  *
  */
-function addStepForm() {
-  const sequences = document.querySelector('#new-meeting-sequences');
-  const seq = document.createElement("div");
-  seq.dataset.kind = "step";
-  seq.classList.add("sequences-table-line", "zoomIn");
-  // FIXME - Should use class instead of style
-  seq.innerHTML = `<input type="text" name="title" value="New step" style="width:250px; margin:0px 2px; text-align:left;"/>
-                    <input type="number" name="duration" min="0.1" value="0.1" style="width:100px; margin:0px 2px; text-align:left;"/>
-                    <select name="color" style="width:100px; margin:0px 2px; text-align:left;">
-                      <option value="blue">blue</option>
-                      <option value="red">red</option>
-                      <option value="green">green</option>
-                      <option value="yellow">yellow</option>
-                      <option value="purple">purple</option>
-                    </select>
-                    <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeStepForm()">
-                  </div>`;
-  sequences.appendChild(seq, sequences.lastElementChild);
+function addSeqForm() {
+  // Get imported files
+  const htmlImport = document.querySelector('link[rel="import"]');
+  const htmlDoc = htmlImport.import;
+
+  const sequencesNode = document.querySelector('#new-meeting-sequences');
+  const tmpl = htmlDoc.querySelector("#sequenceTmpl");
+
+  sequencesNode.appendChild(tmpl.content.cloneNode(true));
+  // Add node reference to sequence form array;
+  sequenceForm.push(tmpl);
 }
 
 /**
  * Remove step form from meeting settings view
  *
  */
-function removeStepForm(i) {
-  const sequences = document.querySelector('#new-meeting-sequences');
+function removeSeqForm(e) {
+  //const sequences = document.querySelector('#new-meeting-sequences');
+  //sequences.removeChild(i);
+  const elem = e.target.parentElement;
+  const parent = document.querySelector('#new-meeting-sequences');
 
-  sequences.removeChild(i);
-  //meeting.removeSequence(i)
+  const i = Array.prototype.indexOf.call(parent.children, elem);
+  sequenceForm.splice(i, 1);
+
+  parent.removeChild(elem);
 }
+
+// SOUND -------------------------------------------------
 
 /**
  * Launch a sound once
@@ -611,22 +667,68 @@ function toggleSound() {
   }
 }
 
+function readFiles() {
+  const node = document.querySelector("#templateFiles");
+  var reader = new FileReader();
+  //var list = new FileList();
+
+  const folder = document.querySelector("#meetingFolder");
+  let result;
+
+  var file = new File("/meetings");
+
+  console.log('test');
+}
+
+// EVENTS / SHORTCUTS -------------------------------------------------
+
+/**
+ * This function is called on a document key_up
+ * Code the shortcuts here
+ */
+function doc_keyUp(event) {
+  /* Those key values have been tested on MAC OS */
+  const KEY_SPACE = 32;
+  const KEY_LEFT = 37;
+  const KEY_RIGHT = 39;
+
+  console.log("You pressed", event.keyCode);
+  if (event.keyCode == KEY_SPACE) {
+    ///
+    // SPACE toggle start/pause
+    ///
+    // We must prevent SPACE default behavior
+    // because if we don't SPACE bar will also push on any selected element
+    // For example, if START button is selected, you push SPACE then
+    // toggleStartPause is called
+    // then button is pushed by the event chain and
+    // then timer is toggled another time
+    event.preventDefault();
+    // And at last, toggle the clock
+    toggleStartPause();
+  } else if (event.keyCode == KEY_LEFT) {
+    previousStep();
+  } else if (event.keyCode == KEY_RIGHT) {
+    nextStep();
+  }
+}
+
 /* Register page shortcuts */
 document.addEventListener("keyup", doc_keyUp, false);
 
 /* Create the progress bar when them DOM has been initialised */
 document.addEventListener('DOMContentLoaded', function() {
-  loadMeeting("data");
+  init();
 
   // Bind module functions to window because of the scoped module
   window.toggleStartPause = toggleStartPause;
-  window.loadMeeting = loadMeeting;
+  window.loadMeetingFromJson = loadMeetingFromJson;
   window.nextStep = nextStep;
   window.previousStep = previousStep;
   window.restart = restart;
-  window.addStepForm = addStepForm;
-  window.removeStepForm = removeStepForm;
-  window.setNewMeeting = setNewMeeting;
+  window.addSeqForm = addSeqForm;
+  window.removeSeqForm = removeSeqForm;
+  window.applyForNewMeeting = applyForNewMeeting;
   window.openSettings = openSettings;
   window.closeSettings = closeSettings;
   window.toggleSound = toggleSound;

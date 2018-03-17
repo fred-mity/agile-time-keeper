@@ -8,7 +8,7 @@ This project permits to display a time keeper companion that help you track time
 
 You have to serve the page using a HTTP Server.
 
-* With [node.js](https://www.npmjs.com/package/http-server):
+* With [node.js](https://www.npmjs.com/package/http-server) (You must get node.js first):
 
 ```bash
 http-server
@@ -30,7 +30,8 @@ and go on [localhost:8080](http://localhost:8080)
 
 ## Configuration
 
-You can set your timer by modifying the `data.json` file
+1/ You can set your timer default template by modifying the `/meetings/data.json` file.
+2/ You are also able to set it dynmically with the settings view (click on settings icon to open it).
 
 ### Set the title of your meeting
 
@@ -56,6 +57,8 @@ A sequence must contains three properties (title, duration and color).
 ]
 ```
 
+### Note
+
 * 1 = a minute
 * 0.1 = 6 sec
 * colors available = blue, red, yellow, purple, green
@@ -67,8 +70,7 @@ You can find the ATK demo [here](https://zolenas.github.io/agile-time-keeper/)
 
 ## Next steps
 
-* Modify the progression timer to display time and not percent
-* Add a settings page to manage the progress bar.
+* Mobile adaptation (PWA and/or Cordova)
 
 ## Authors
 

@@ -2,6 +2,7 @@ html body {
   background-color: #212121;
   color: #fafafa;
   font-family: Tahoma, Verdana, Geneva, sans-serif;
+  min-width: 340px;
 }
 
 /* Loader + anim */
@@ -77,6 +78,9 @@ nav {
   color: #424242;
   padding: 10px 20px;
   z-index: 1000;
+
+  -webkit-transition: all 0.4s; /* Safari */
+  transition: all 0.4s;
 }
 
 .bar-container {
@@ -209,7 +213,7 @@ nav {
 }
 
 .btn-container {
-  text-align: center;
+  position: relative;
   z-index: 10;
 }
 
@@ -245,7 +249,13 @@ nav {
 }
 
 .btn.btn-secondary {
+  position: absolute;
+  top: 0; left: 50%;
   background-color: #fafafa;
+}
+
+.btn-secondary:nth-child(1) {
+  transform: translateX(-210px);
 }
 
 #startBtn {
@@ -517,6 +527,7 @@ footer a:hover {
 footer:hover {
   color: #8a8a8a;
 }
+<<<<<<< Updated upstream:styles/index.css
 
 /* Colors */
 .progress-bar.red {
@@ -538,6 +549,7 @@ footer:hover {
 .progress-bar.purple {
   background-color: #673ab7;
 }
+<<<<<<< HEAD:styles/index.css
 
 
 @-webkit-keyframes zoomIn {
@@ -573,3 +585,7 @@ footer:hover {
   -webkit-animation-name: zoomIn;
   animation-name: zoomIn;
 }
+=======
+>>>>>>> Stashed changes:styles/screen.css
+=======
+>>>>>>> ergo:styles/screen.css
