@@ -471,11 +471,19 @@ nav {
 }
 
 .sequences-table-line .table-line-max {
+<<<<<<< HEAD
     width: 75px;
 }
 
 .sequences-table-line .table-line-min {
     width: 70px;
+=======
+    width: 250px;
+}
+
+.sequences-table-line .table-line-min {
+    width: 100px;
+>>>>>>> ergo
 }
 
 .meetings-form-btns {
@@ -527,6 +535,30 @@ footer:hover {
     color: #8a8a8a;
 }
 
+<<<<<<< HEAD
+=======
+/* Colors */
+.progress-bar.red {
+    background-color: #f44336;
+}
+
+.progress-bar.blue {
+    background-color: #03a9f4;
+}
+
+.progress-bar.green {
+    background-color: #4caf50;
+}
+
+.progress-bar.yellow {
+    background-color: #ffc107;
+}
+
+.progress-bar.purple {
+    background-color: #673ab7;
+}
+
+>>>>>>> ergo
 .shortcuts-container, .templates-container, .extra-container {
     display: none;
 }
