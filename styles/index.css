@@ -517,6 +517,7 @@ footer a:hover {
 footer:hover {
   color: #8a8a8a;
 }
+<<<<<<< Updated upstream:styles/index.css
 
 /* Colors */
 .progress-bar.red {
@@ -573,3 +574,5 @@ footer:hover {
   -webkit-animation-name: zoomIn;
   animation-name: zoomIn;
 }
+=======
+>>>>>>> Stashed changes:styles/screen.css

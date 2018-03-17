@@ -1,0 +1,14 @@
+<template id="sequenceTmpl" class="sequences-table-line zoomIn">
+  <div class="sequences-table-line zoomIn">
+    <input type="text" name="title" value="New step" class="table-line-max"/>
+    <input type="number" name="duration" min="0" value="1" class="table-line-min"/>
+    <select name="color" class="table-line-min">
+      <option value="blue">blue</option>
+      <option value="red">red</option>
+      <option value="green">green</option>
+      <option value="yellow">yellow</option>
+      <option value="purple">purple</option>
+    </select>
+    <img src="assets/icons/ic_delete.svg" alt="Delete icon" class="default-btn" onclick="removeSeqForm(event)">
+  </div>
+</template>
