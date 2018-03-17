@@ -2,6 +2,7 @@ html body {
   background-color: #212121;
   color: #fafafa;
   font-family: Tahoma, Verdana, Geneva, sans-serif;
+  min-width: 340px;
 }
 
 /* Loader + anim */
@@ -77,6 +78,9 @@ nav {
   color: #424242;
   padding: 10px 20px;
   z-index: 1000;
+
+  -webkit-transition: all 0.4s; /* Safari */
+  transition: all 0.4s;
 }
 
 .bar-container {
@@ -209,7 +213,7 @@ nav {
 }
 
 .btn-container {
-  text-align: center;
+  position: relative;
   z-index: 10;
 }
 
@@ -245,7 +249,13 @@ nav {
 }
 
 .btn.btn-secondary {
+  position: absolute;
+  top: 0; left: 50%;
   background-color: #fafafa;
+}
+
+.btn-secondary:nth-child(1) {
+  transform: translateX(-210px);
 }
 
 #startBtn {
@@ -537,39 +547,4 @@ footer:hover {
 
 .progress-bar.purple {
   background-color: #673ab7;
-}
-
-
-@-webkit-keyframes zoomIn {
-  from {
-    opacity: 0;
-    -webkit-transform: scale3d(0.3, 0.3, 0.3);
-    transform: scale3d(0.3, 0.3, 0.3);
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes zoomIn {
-  from {
-    opacity: 0;
-    -webkit-transform: scale3d(0.3, 0.3, 0.3);
-    transform: scale3d(0.3, 0.3, 0.3);
-  }
-
-  50% {
-    opacity: 1;
-  }
-}
-
-.zoomIn {
-  -webkit-animation-duration: 700ms;
-  animation-duration: 700ms;
-  -webkit-animation-fill-mode: both;
-  animation-fill-mode: both;
-
-  -webkit-animation-name: zoomIn;
-  animation-name: zoomIn;
 }
