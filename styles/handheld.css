@@ -408,7 +408,7 @@ nav {
     width: 300px;
     background: #212121;
     border: 2px solid #fafafa;
-    padding: 8px;
+    padding: 2px;
 }
 
 .new-meeting-sequences > * {
@@ -423,7 +423,7 @@ nav {
 }
 
 .settings-meeting-form > div {
-    padding: 14px;
+    padding: 6px;
     border: 1px solid #424242;
     margin: 2px 0px;
 
@@ -432,6 +432,24 @@ nav {
     -webkit-animation-fill-mode: both;
     animation-fill-mode: both;
 }
+
+.new-meeting-header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.new-meeting-header select {
+  height: 26px;
+  margin-right: 6px;
+}
+
+.settings-close-btn {
+  position: absolute;
+  right: 20px;
+  z-index: 100;
+}
+
 
 .settings-meeting-form > .default-btn {
     align-items: flex-end;
@@ -444,7 +462,7 @@ nav {
 }
 
 .meeting-form-title input {
-    width: 250px;
+    width: 280px;
 }
 
 .meeting-form-sequences {
@@ -471,29 +489,22 @@ nav {
 }
 
 .sequences-table-line .table-line-max {
-<<<<<<< HEAD
-    width: 75px;
+    width: 80px;
 }
 
 .sequences-table-line .table-line-min {
-    width: 70px;
-=======
-    width: 250px;
-}
-
-.sequences-table-line .table-line-min {
-    width: 100px;
->>>>>>> ergo
+    width: 80px;
 }
 
 .meetings-form-btns {
-    display: flex;
-    flex-flow: row nowrap;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
 }
 
 .meetings-form-btns .default-btn {
-    flex: 1;
-    margin: 0px 2px;
+  margin: 0px 2px;
+  height: 40px; width: 160px;
 }
 
 .settings-close-btn {
@@ -535,30 +546,6 @@ footer:hover {
     color: #8a8a8a;
 }
 
-<<<<<<< HEAD
-=======
-/* Colors */
-.progress-bar.red {
-    background-color: #f44336;
-}
-
-.progress-bar.blue {
-    background-color: #03a9f4;
-}
-
-.progress-bar.green {
-    background-color: #4caf50;
-}
-
-.progress-bar.yellow {
-    background-color: #ffc107;
-}
-
-.progress-bar.purple {
-    background-color: #673ab7;
-}
-
->>>>>>> ergo
 .shortcuts-container, .templates-container, .extra-container {
     display: none;
 }

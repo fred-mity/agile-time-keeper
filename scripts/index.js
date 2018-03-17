@@ -70,10 +70,11 @@ function setPage() {
 
 /**
  * Load a meeting template JSON
- *
+ * : If callback, launch it instead of refreshing the page directly
  * @param {string} fileName
+ * @param {function} callback
  */
-function loadMeetingFromJson(fileName) {
+function loadMeetingFromJson(fileName, callback) {
   // load a meeting template with given name
   const xmlhttp = new XMLHttpRequest();
   const url = `meetings/${fileName}.json`;
@@ -86,7 +87,12 @@ function loadMeetingFromJson(fileName) {
       const res = JSON.parse(this.responseText);
       meeting = new Meeting(res.title, res.sequences);
 
-      setPage();
+      if(!callback) {
+        setPage();
+      } else {
+        callback();
+      }
+
       load(false);
     }
   };
@@ -537,7 +543,6 @@ function restart() {
  *
  */
 function openSettings() {
-  //readFiles();
   document.querySelector('#settingsModal').style.display = "flex";
 }
 
@@ -608,19 +613,75 @@ function applyForNewMeeting() {
 
 /**
  *  Add a new step form in meeting settings view
- *
+ * : If seq defined, set node properties
+ * @param {object} seq
  */
-function addSeqForm() {
+function addSeqForm(seq) {
   // Get imported files
   const htmlImport = document.querySelector('link[rel="import"]');
   const htmlDoc = htmlImport.import;
 
   const sequencesNode = document.querySelector('#new-meeting-sequences');
-  const tmpl = htmlDoc.querySelector("#sequenceTmpl");
+  const tmpl = htmlDoc.querySelector("#sequenceTmpl").content;
+  const elem = tmpl.cloneNode(true);
 
-  sequencesNode.appendChild(tmpl.content.cloneNode(true));
+  if(seq) {
+    elem.querySelector('.table-line-title').value = seq.title ? seq.title : "New sequence";
+    elem.querySelector('.table-line-duration').value = seq.duration ? seq.duration : 1;
+    elem.querySelector('.table-line-color').value = seq.color ? seq.color : "red";
+  }
+
+  sequencesNode.appendChild(elem);
+
   // Add node reference to sequence form array;
-  sequenceForm.push(tmpl);
+  sequenceForm.push(elem);
+}
+
+/**
+ * Refresh settings view according to loaded JSON
+ *
+ * @param {any} meetingName
+ */
+function refreshSettingsView(meetingName) {
+  const refresh = function() {
+    // Clear setting view without refreshing it
+    clearSettings(true);
+
+    // Set settings view title value
+    document.querySelector('#new-meeting-title').value = meeting.getTitle();
+
+    const sequences = meeting.getSequences();
+    sequences.forEach(function(seq) {
+      addSeqForm(seq);
+    })
+  }
+
+  // Reload meeting without refreshing the page (set meeting global object)
+  loadMeetingFromJson(meetingName, refresh);
+}
+
+/**
+ * Clear settings view
+ * : Avoid refresh if needed
+ * @param {any} noRefresh
+ */
+function clearSettings(noRefresh) {
+  // Clear title
+  const title = document.querySelector('#new-meeting-title');
+  title.value = "";
+
+  // Clear sequences
+  sequenceForm = [];
+  const sequences = document.querySelector('#new-meeting-sequences');
+  sequences.innerHTML = "";
+
+  if(!noRefresh) {
+    // Reset selected template list
+    document.querySelector('#meeting_dropdown').selectedIndex = 0;
+
+    title.value = "New meeting";
+    addSeqForm();
+  }
 }
 
 /**
@@ -665,19 +726,6 @@ function toggleSound() {
   } else {
     soundManager.setAttribute("src", "assets/icons/ic_volume_off.svg");
   }
-}
-
-function readFiles() {
-  const node = document.querySelector("#templateFiles");
-  var reader = new FileReader();
-  //var list = new FileList();
-
-  const folder = document.querySelector("#meetingFolder");
-  let result;
-
-  var file = new File("/meetings");
-
-  console.log('test');
 }
 
 // EVENTS / SHORTCUTS -------------------------------------------------
@@ -732,4 +780,6 @@ document.addEventListener('DOMContentLoaded', function() {
   window.openSettings = openSettings;
   window.closeSettings = closeSettings;
   window.toggleSound = toggleSound;
+  window.refreshSettingsView = refreshSettingsView;
+  window.clearSettings = clearSettings;
 });
