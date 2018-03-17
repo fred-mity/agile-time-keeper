@@ -30,7 +30,7 @@ and go on [localhost:8080](http://localhost:8080)
 
 ## Configuration
 
-1/ You can set your timer default template by modifying the `data.json` file.
+1/ You can set your timer default template by modifying the `/meetings/data.json` file.
 2/ You are also able to set it dynmically with the settings view (click on settings icon to open it).
 
 ### Set the title of your meeting

@@ -3,24 +3,24 @@
     "sequences": [
         {
             "title": "Iron man",
-            "duration": 0.1,
+            "duration": 1,
             "color": "red"
         },
         {
             "title": "Superman",
-            "duration": 0.2,
+            "duration": 1,
             "color": "purple",
             "extra": "extra content is extra cool !"
         },
         {
             "title": "Batman",
-            "duration": 0.4,
+            "duration": 1,
             "color": "blue",
             "extra": "A major topic that takes time"
         },
         {
             "title": "Hulk",
-            "duration": 0.5,
+            "duration": 1,
             "color": "green"
         }
     ]
