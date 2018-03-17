@@ -50,45 +50,29 @@
             </div>
         </div>
 
-        <div class="templates-container fab-btn-container">
-            <div class="templates-btn fab-btn" title="Templates">
-                <img src="assets/icons/ic_list.svg" alt="List icon">
-            </div>
-            <div class="meeting-templates fab-content">
-                <span onclick="loadMeetingFromJson('data')"
-                class="meeting-template" title="Default">
-                    Default
-                </span>
-                <span onclick="loadMeetingFromJson('data_15m')"
-                class="meeting-template" title="(2/10/3)">
-                    15min
-                </span>
-                <span onclick="loadMeetingFromJson('data_30m')"
-                class="meeting-template" title="(5/20/5)">
-                    30min
-                </span>
-                <span onclick="loadMeetingFromJson('data_1h')"
-                class="meeting-template" title="(5/45/5)">
-                    1H
-                </span>
-                <span onclick="loadMeetingFromJson('data_2h')"
-                class="meeting-template" title="(15/90/15)">
-                    2H
-                </span>
-            </div>
-        </div>
-
         <div class="settings-container fab-btn-container">
           <div class="settings-btn fab-btn" title="Set meeting" onclick="openSettings()">
               <img src="assets/icons/ic_settings.svg" alt="Settings icon">
           </div>
           <div id="settingsModal" class="settings-modal">
             <div class="settings">
-              <img src="assets/icons/ic_clear.svg" alt="Close icon" class="settings-close-btn default-btn" onclick="closeSettings()" alt="Close icon" onclick="removeStepForm(event)">
               <form method="dialog" id="meetings-form" class="settings-meeting-form">
+                <div class="new-meeting-header">
+                  <select id="meeting_dropdown" name="meeting_dropdown" onchange="refreshSettingsView(this.value)">
+                    <option value="" disabled selected hidden>Select a template</option>
+                    <option value="data" title="Default">Default</option>
+                    <option value="data_15m" title="(2/10/3)">15min</option>
+                    <option value="data_30m" title="(5/20/5)">30min</option>
+                    <option value="data_1h" title="(5/45/5)">1h00</option>
+                    <option value="data_2h" title="(15/90/15)">2h00</option>
+                  </select>
+                  <img src="assets/icons/ic_replay.svg" alt="Refresh icon" class="default-btn" onclick="clearSettings()">
+                  <!--<img src="assets/icons/ic_add.svg" alt="Save icon" class="default-btn" onclick="">-->
+                  <img src="assets/icons/ic_clear.svg" alt="Close icon" class="settings-close-btn default-btn" onclick="closeSettings()">
+                </div>
                 <div class="meeting-form-title">
                   <label for="new-meeting-title">Title</label>
-                  <input type="text" name="new-meeting-title" id="new-meeting-title"/>
+                  <input type="text" name="new-meeting-title" id="new-meeting-title" value="New meeting"/>
                 </div>
                 <div class="meeting-form-sequences">
                   <h3>Sequences</h3>

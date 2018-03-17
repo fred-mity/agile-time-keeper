@@ -434,6 +434,23 @@ nav {
   animation-fill-mode: both;
 }
 
+.new-meeting-header {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+}
+
+.new-meeting-header select {
+  height: 26px;
+  margin-right: 6px;
+}
+
+.settings-close-btn {
+  position: absolute;
+  right: 20px;
+  z-index: 100;
+}
+
 .settings-meeting-form > .default-btn {
   align-items: flex-end;
 }
@@ -482,17 +499,12 @@ nav {
 .meetings-form-btns {
   display: flex;
   flex-flow: row nowrap;
+  justify-content: space-between;
 }
 
 .meetings-form-btns .default-btn {
-  flex: 1;
   margin: 0px 2px;
-}
-
-.settings-close-btn {
-  position: absolute;
-  right: 10px; top: 10px;
-  z-index: 100;
+  height: 44px; width: 200px;
 }
 
 footer {
