@@ -71,6 +71,7 @@ You can find the ATK demo [here](https://zolenas.github.io/agile-time-keeper/)
 ## Next steps
 
 * Mobile adaptation (PWA and/or Cordova)
+* Save on default template
 
 ## Authors
 
