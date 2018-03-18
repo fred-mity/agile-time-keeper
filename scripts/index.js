@@ -110,10 +110,10 @@ function load(bool) {
   const loader = document.querySelector('#loader-container');
   if(bool) {
       loader.style.opacity = 1;
-      loader.style.pointerEvents = all;
+      loader.style.pointerEvents = "all";
   } else {
       loader.style.opacity = 0;
-      loader.style.pointerEvents = none;
+      loader.style.pointerEvents = "none";
   }
 }
 
