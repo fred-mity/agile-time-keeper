@@ -12,9 +12,10 @@ html body {
     justify-content: center;
     align-items: center;
 
+    background-color: #212121;
+
     height: 100%; width: 100%;
     z-index: 1000;
-    background-color: #212121;
 }
 
 .loader {
@@ -78,7 +79,7 @@ nav {
 
     color: #424242;
     padding: 10px 20px;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .bar-container {
@@ -398,6 +399,8 @@ nav {
     justify-content: center;
     align-items: center;
     background-color: rgba(0, 0, 0, 0.8);
+
+    z-index: 200;
 
     -webkit-animation-name: zoomIn;
     animation-name: zoomIn;
