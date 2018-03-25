@@ -1,7 +1,42 @@
-@media screen and (max-width: 880px) {
-    nav {
-        /*flex-flow: row wrap !important;
-        width: 180px;*/
-        top: 100px !important;
-    }
+@media (max-width: 880px) {
+  header {
+    height: 100px;
+    margin-bottom: 50px;
+  }
+
+  #date {
+    padding: 0 30px;
+  }
+
+  nav {
+      flex-flow: row wrap !important;
+      top: 0px !important;
+      height: 100%;
+      pointer-events: none;
+  }
+
+  nav > div {
+    width: 64px;
+    pointer-events: all;
+  }
+
+  nav > div:first-child {
+    position: absolute;
+    top: 48px;
+  }
+
+  nav div:nth-child(2),
+  nav div:last-child {
+    align-self: flex-end;
+  }
+
+  .bar-container {
+    height: 160px;
+    margin: 20px;
+    margin-bottom: 0;
+  }
+
+  .subtitle-container {
+    padding: 10px;
+  }
 }
