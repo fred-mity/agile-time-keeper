@@ -39,4 +39,27 @@
   .subtitle-container {
     padding: 10px;
   }
+
+  .meeting-form-sequences > .sequences-table-line {
+    display: none;
+  }
+
+  #new-meeting-sequences {
+    max-height: 150px;
+    overflow: auto;
+  }
+
+  .sequences-table-line {
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: stretch;
+    margin-bottom: 14px;
+  }
+
+  .sequences-table-line .table-line-max,
+  .sequences-table-line .table-line-min {
+    width: initial;
+    margin: 0 0;
+    margin-bottom: 4px;
+  }
 }
