@@ -17,7 +17,7 @@ html body {
 
   opacity: 0;
   pointer-events: none;
-  
+
   -webkit-transition: opacity 0.3s; /* Safari */
   transition: opacity 0.3s;
 
@@ -189,6 +189,7 @@ nav {
   padding: 4px 0px;
   font-size: 0.4em;
   text-transform: uppercase;
+  pointer-events: none;
 }
 
 .title-top {
