@@ -33,22 +33,22 @@ You have to serve the page and see your modifications using an HTTP Server.
 * With [node.js](https://www.npmjs.com/package/http-server) (You must get node.js first):
 
 ```bash
-http-server
+http-server -p 4200
 ```
 
 * With [python 2](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
-python -m SimpleHTTPServer 8080
+python -m SimpleHTTPServer 4200
 ```
 
 * With [python 3](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
-python -m http.server 8080
+python -m http.server 4200
 ```
 
-and go on [localhost:8080](http://localhost:8080)
+and go on [localhost:4200](http://localhost:4200)
 
 ## Configuration
 
