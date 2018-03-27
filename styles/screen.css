@@ -13,9 +13,16 @@ html body {
   justify-content: center;
   align-items: center;
 
+  background-color: #212121;
+
+  opacity: 0;
+  pointer-events: none;
+
+  -webkit-transition: opacity 0.3s; /* Safari */
+  transition: opacity 0.3s;
+
   height: 100%; width: 100%;
   z-index: 1000;
-  background-color: #212121;
 }
 
 .loader {
@@ -77,7 +84,7 @@ nav {
 
   color: #424242;
   padding: 10px 20px;
-  z-index: 1000;
+  z-index: 100;
 
   -webkit-transition: all 0.4s; /* Safari */
   transition: all 0.4s;
@@ -182,6 +189,7 @@ nav {
   padding: 4px 0px;
   font-size: 0.4em;
   text-transform: uppercase;
+  pointer-events: none;
 }
 
 .title-top {
@@ -401,6 +409,7 @@ nav {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.8);
 
+  z-index: 200;
   -webkit-animation-name: zoomIn;
   animation-name: zoomIn;
 }

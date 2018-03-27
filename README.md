@@ -6,27 +6,49 @@ This project permits to display a time keeper companion that help you track time
 
 ## Serve the pages
 
-You have to serve the page using a HTTP Server.
+### Basic user mode
+
+The ATK project is deployed on the Docker Hub. To install you can :
+
+* First get [docker](https://docs.docker.com/install) :
+
+And use plain-old Docker command
+
+```bash
+docker run -d -p 4200:80 --name atk zolenas/atk
+```
+
+* Or with [docker-compose](https://docs.docker.com/compose/install) (you will have to get the docker-compose.yml file first) :
+
+```bash
+docker-compose up -d
+```
+
+(this command must be launched at the docker-compose.yml file level)
+
+### Developer mode
+
+You have to serve the page and see your modifications using an HTTP Server.
 
 * With [node.js](https://www.npmjs.com/package/http-server) (You must get node.js first):
 
 ```bash
-http-server
+http-server -p 4200
 ```
 
 * With [python 2](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
-python -m SimpleHTTPServer 8080
+python -m SimpleHTTPServer 4200
 ```
 
 * With [python 3](https://docs.python.org/2/library/simplehttpserver.html):
 
 ```bash
-python -m http.server 8080
+python -m http.server 4200
 ```
 
-and go on [localhost:8080](http://localhost:8080)
+and go on [localhost:4200](http://localhost:4200)
 
 ## Configuration
 
@@ -71,6 +93,7 @@ You can find the ATK demo [here](https://zolenas.github.io/agile-time-keeper/)
 ## Next steps
 
 * Mobile adaptation (PWA and/or Cordova)
+* Save on default template
 
 ## Authors
 

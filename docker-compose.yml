@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  atk:
+    image: 'zolenas/atk:latest'
+    container_name: 'atk'
+    restart: 'always'
+    ports:
+      - '4200:80'
+#   volumes:
+#     - './meetings:/usr/share/nginx/html/meetings:rw'
